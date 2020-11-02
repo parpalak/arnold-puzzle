@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Arnold' puzzle</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<h1>Arnold' puzzle</h1>
+<p>
+    <button onclick="renderer.toggleRun()">Run</button>
+</p>
+
+<canvas id="canvas" width="600" height="600"></canvas>
+<p id="info"></p>
+<script src="utils.js"></script>
+<script src="model.js"></script>
+<script src="script.js"></script>
+<script>
+    const eCanvas = document.getElementById('canvas');
+    const field = new Field();
+    // field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0]);
+    // field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0]);
+    field.parseGenerators([1, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 3, 5, 7, 6, 5, 4, 3, 2, 1, 3, 5, 7, 8, 7, 6, 5, 4, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 5, 4, 5, 7, 6, 5, 7, 9, 8, 7, 9]);
+
+    const renderer = new Renderer(eCanvas, field);
+    renderer.drawFrame();
+
+    eCanvas.addEventListener('wheel', function (e) {
+        let delta = e.deltaY || e.detail;
+
+        if (!e.ctrlKey) {
+            renderer.changeZoom(delta > 0 ? 1 : -1);
+            renderer.drawFrame();
+        }
+    });
+
+    let mousePressed = false, x, y;
+    eCanvas.addEventListener('mousedown', function (e) {
+        mousePressed = true;
+        x = e.offsetX;
+        y = e.offsetY;
+    });
+    eCanvas.addEventListener('mouseup', function (e) {
+        mousePressed = false;
+    });
+    eCanvas.addEventListener('mousemove', function (e) {
+        if (mousePressed === true) {
+            if (e.buttons % 2 === 0) {
+                mousePressed = false;
+                return;
+            }
+            renderer.shift(e.offsetX - x, e.offsetY - y);
+            renderer.drawFrame();
+            x = e.offsetX;
+            y = e.offsetY;
+        }
+    });
+    setInterval(() => {
+        document.getElementById('info').innerHTML = 'E: ' + (field.w_pot + field.w_kin)
+            + '<br>W: ' + field.w_pot
+            + '<br>K: ' + field.w_kin
+            + '<br>fps: ' + renderer.fps
+            + '<br>itns: ' + field.iterations
+        ;
+    }, 1000);
+</script>
+</body>
+</html>
