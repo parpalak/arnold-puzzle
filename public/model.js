@@ -81,11 +81,11 @@ class Point {
      */
     realMove() {
         for (let step = 0; step < 5; step++) {
-            this.stored_rx += this.k_rx[step]*beta_last[step];
-            this.stored_ry += this.k_ry[step]*beta_last[step];
+            this.stored_rx += this.k_rx[step] * beta_last[step];
+            this.stored_ry += this.k_ry[step] * beta_last[step];
 
-            this.stored_vx += this.k_vx[step]*beta_last[step];
-            this.stored_vy += this.k_vy[step]*beta_last[step];
+            this.stored_vx += this.k_vx[step] * beta_last[step];
+            this.stored_vy += this.k_vy[step] * beta_last[step];
         }
 
         return sqr(this.stored_vx) + sqr(this.stored_vy);
@@ -190,8 +190,8 @@ class Line {
 }
 
 class Field {
-    n = 0;
-    n_gen = 0;
+    lineNum = 0;
+    generatorNum = 0;
     s = 0;
 
     /**
@@ -216,12 +216,22 @@ class Field {
     float_time = true;
     _iterations = 0;
 
+    /**
+     * @type {Polygon[]}
+     * @private
+     */
+    _polygons = [];
+
     get points() {
         return this._points;
     }
 
     get lines() {
         return this._lines;
+    }
+
+    get polygons() {
+        return this._polygons;
     }
 
     get iterations() {
@@ -233,81 +243,124 @@ class Field {
 
     parseGenerators(generators) {
         let i;
-        this.n_gen = generators.length;
+        this.generatorNum = generators.length;
 
         // Может генераторы идут не с нуля? Ща исправим
-        let min_generator = generators[0];
-        let max_generator = generators[0];
-        for (i = 1; i < this.n_gen; i++) {
-            if (min_generator > generators[i]) {
-                min_generator = generators[i];
-            }
-            if (max_generator < generators[i]) {
-                max_generator = generators[i];
-            }
-        }
+        const minGenerator = Math.min(...generators);
+        const maxGenerator = Math.max(...generators);
 
         // Считаем разность
         this.s = 0;
-        for (i = 0; i < this.n_gen; i++) {
-            generators[i] -= min_generator;
+        for (i = 0; i < this.generatorNum; i++) {
+            generators[i] -= minGenerator;
             this.s += 2 * (generators[i] % 2) - 1;
         }
 
-        // Определяем кол-во прямых
-        this.n = max_generator - min_generator + 2;
+        this.lineNum = maxGenerator - minGenerator + 2;
 
         // готовим матрицу прямых
         this._lines = [];
-        for (i = 0; i < this.n; i++) {
+        for (i = 0; i < this.lineNum; i++) {
             this._lines[i] = new Line(getRandomColor());
         }
 
         // Готовим перестановку
-        let rearr = [], inv_a = [];
-        for (i = 0; i < this.n; i++) {
-            rearr[i] = i;
+        let rearrangement = [], inverseRearrangement = [];
+        for (i = 0; i < this.lineNum; i++) {
+            rearrangement[i] = i;
+        }
+
+        /** @type {Polygon[]} */
+        let polygons = [];
+        /** @type {Polygon[]} */
+        let topPolygons = [];
+        for (i = -1; i < this.lineNum; i++) {
+            // TODO учесть знак s
+            topPolygons[i] = polygons[i] = new Polygon(Math.abs(i) % 2);
         }
 
         // Парсим генераторы
         this._points = [];
-        for (i = 0; i < this.n_gen; i++) {
+        for (i = 0; i < this.generatorNum; i++) {
+            const generator = generators[i];
+
             // Меняем местами соседние элементы в перестановке
-            let a_i = rearr[generators[i]];
-            rearr[generators[i]] = rearr[generators[i] + 1];
-            rearr[generators[i] + 1] = a_i;
+            let a_i = rearrangement[generator];
+            rearrangement[generator] = rearrangement[generator + 1];
+            rearrangement[generator + 1] = a_i;
 
-            let point = new Point(((i - this.n_gen / 2) / this.n * 2), (generators[i] - this.n / 2));
+            let point = new Point(((i - this.generatorNum / 2) / this.lineNum * 2), (generator - this.lineNum / 2));
 
-            this._lines[rearr[generators[i]]].addPoint(point);
-            this._lines[rearr[generators[i] + 1]].addPoint(point);
+            this._lines[rearrangement[generator]].addPoint(point);
+            this._lines[rearrangement[generator + 1]].addPoint(point);
 
             this._points.push(point);
+
+            const polygon = polygons[generator];
+            polygon.addLeftPoint(point);
+            if (polygon.isClosed || polygon === topPolygons[generator]) {
+                if (polygon !== topPolygons[generator]) {
+                    polygon.addTopPointsAndClose();
+                    this._polygons.push(polygon);
+                }
+
+                polygons[generator] = new Polygon(Math.abs(generator) % 2);
+                polygons[generator].addLeftPoint(point);
+            }
+            polygons[generator - 1].addRightPoint(point);
+            polygons[generator + 1].addLeftPoint(point);
         }
 
         // Смотрим, как расположены точки внизу карты метро, нужно для правильной
         // расстановки фиктивных точек.
         let str = '';
-        for (i = 0; i < this.n; i++) {
-            str += ' ' + rearr[i];
-            inv_a[rearr[i]] = i;
+        for (i = 0; i < this.lineNum; i++) {
+            str += ' ' + rearrangement[i];
+            inverseRearrangement[rearrangement[i]] = i;
         }
 
         // Добавляем фиктивные точки
-        for (i = 0; i < this.n; i++) {
-            if (i === rearr[this.n - 1 - i]) {
-                const angle1 = Math.PI * (1.5 - (0.5 + i) / this.n);
-                this._lines[i].prependPoint(new Point(infinity * Math.cos(angle1), infinity * Math.sin(angle1)));
+        for (i = this.lineNum; i--;) {
+            // It's important to count i down since it's hard to make top polygons oriented.
 
-                const angle2 = Math.PI * (-0.5 + (0.5 + inv_a[i]) / this.n);
-                this._lines[i].addPoint(new Point(infinity * Math.cos(angle2), infinity * Math.sin(angle2)));
+            let pointTop;
+            let pointBottom;
+
+            if (i === rearrangement[this.lineNum - 1 - i]) {
+                // This line is not parallel to any other line
+                const angle1 = Math.PI * (1.5 - (0.5 + i) / this.lineNum);
+                pointTop = new Point(infinity * Math.cos(angle1), infinity * Math.sin(angle1));
+
+                const angle2 = Math.PI * (-0.5 + (0.5 + inverseRearrangement[i]) / this.lineNum);
+                pointBottom = new Point(infinity * Math.cos(angle2), infinity * Math.sin(angle2));
             } else {
-                const angle1 = Math.PI * (1.5 - (0.5 + i + 0.5 + rearr[this.n - i - 1]) / this.n / 2);
-                this._lines[i].prependPoint(new Point(infinity * Math.cos(angle1), infinity * Math.sin(angle1)));
+                // This is a parallel line
+                const angle1 = Math.PI * (1.5 - (0.5 + i + 0.5 + rearrangement[this.lineNum - i - 1]) / this.lineNum / 2);
+                pointTop = new Point(infinity * Math.cos(angle1), infinity * Math.sin(angle1));
 
-                const angle2 = Math.PI * (-0.5 + (0.5 + inv_a[i] + 0.5 + inv_a[rearr[this.n - i - 1]]) / this.n / 2);
-                this._lines[i].addPoint(new Point(infinity * Math.cos(angle2), infinity * Math.sin(angle2)));
+                const angle2 = Math.PI * (-0.5 + (0.5 + inverseRearrangement[i] + 0.5 + inverseRearrangement[rearrangement[this.lineNum - i - 1]]) / this.lineNum / 2);
+                pointBottom = new Point(infinity * Math.cos(angle2), infinity * Math.sin(angle2));
             }
+
+            this._lines[i].prependPoint(pointTop);
+
+            if (i === this.lineNum - 1) {
+                topPolygons[i].addRightPoint(pointTop);
+            } else {
+                topPolygons[i].addTopPointsAndClose(pointTop);
+                this._polygons.push(topPolygons[i]);
+            }
+            topPolygons[i - 1].prependRightPoint(pointTop);
+
+            this._lines[i].addPoint(pointBottom);
+
+            polygons[inverseRearrangement[i]].addLeftPoint(pointBottom);
+            polygons[inverseRearrangement[i] - 1].addRightPoint(pointBottom);
+        }
+
+        for (i = -1; i < this.lineNum; i++) {
+            polygons[i].addTopPointsAndClose();
+            this._polygons.push(polygons[i]);
         }
     }
 
@@ -318,17 +371,17 @@ class Field {
         //     dt1 = Math.min(this.dt, this.time_step);
         // }
         // else {
-            dt1 = this.dt;
+        dt1 = this.dt;
         // }
 
         // this.calcForces();
 
         for (let step = 0; step < 5; step++) {
-            for (let i = this.n_gen; i--; ) {
+            for (let i = this.generatorNum; i--;) {
                 this._points[i].makeStep(step);
             }
             this.calcForces();
-            for (let i = this.n_gen; i--; ) {
+            for (let i = this.generatorNum; i--;) {
                 this._points[i].storeDerivativeForStep(step, dt1);
             }
         }
@@ -337,7 +390,7 @@ class Field {
         this.new_time_step = this.dt;
 
         this.w_kin = 0;
-        for (let i = this.n_gen; i--; ) {
+        for (let i = this.generatorNum; i--;) {
             this.w_kin += this._points[i].realMove();
         }
 
@@ -350,13 +403,32 @@ class Field {
         this.w_pot = 0;
 
         // Oscillator potential and liquid friction
-        for (let i = 0; i < this.n_gen; i++) {
+        for (let i = 0; i < this.generatorNum; i++) {
             this.w_pot += this._points[i].setGlobalForces(k_spring, k_friction);
         }
 
-        for (let i = 0; i < this.n; i++) {
+        for (let i = 0; i < this.lineNum; i++) {
             this.w_pot += this._lines[i].addElasticForce(k_elastic);
             this.w_pot += this._lines[i].addElectricForce(q2);
         }
+    }
+
+    flipTriangle(x, y) {
+        let nearestDistance2 = sqr(infinity);
+        let nearestPoint;
+        for (let i = this._points.length; i--;) {
+            const pt = this._points[i];
+            const distance2 = sqr(x - pt.rx) + sqr(y - pt.ry);
+            if (distance2 < nearestDistance2) {
+                nearestDistance2 = distance2;
+                nearestPoint = i;
+            }
+        }
+
+        if (!nearestPoint) {
+            return;
+        }
+
+
     }
 }

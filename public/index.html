@@ -15,13 +15,14 @@
 <p id="info"></p>
 <script src="utils.js"></script>
 <script src="model.js"></script>
-<script src="script.js"></script>
+<script src="polygon.js"></script>
+<script src="renderer.js"></script>
 <script>
     const eCanvas = document.getElementById('canvas');
     const field = new Field();
     // field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0]);
-    // field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1, 0]);
-    field.parseGenerators([1, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 3, 5, 7, 6, 5, 4, 3, 2, 1, 3, 5, 7, 8, 7, 6, 5, 4, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 5, 4, 5, 7, 6, 5, 7, 9, 8, 7, 9]);
+    field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1]);
+    // field.parseGenerators([1, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 3, 5, 7, 6, 5, 4, 3, 2, 1, 3, 5, 7, 8, 7, 6, 5, 4, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 5, 4, 5, 7, 6, 5, 7, 9, 8, 7, 9]);
 
     const renderer = new Renderer(eCanvas, field);
     renderer.drawFrame();
@@ -35,14 +36,17 @@
         }
     });
 
-    let mousePressed = false, x, y;
+    let mousePressed = false, x, y, clickX, clickY;
     eCanvas.addEventListener('mousedown', function (e) {
         mousePressed = true;
-        x = e.offsetX;
-        y = e.offsetY;
+        clickX = x = e.offsetX;
+        clickY = y = e.offsetY;
     });
     eCanvas.addEventListener('mouseup', function (e) {
         mousePressed = false;
+        if (Math.abs(e.offsetX - clickX) < 3 && Math.abs(e.offsetY - clickY) < 3) {
+            renderer.doClick(e.offsetX, e.offsetY);
+        }
     });
     eCanvas.addEventListener('mousemove', function (e) {
         if (mousePressed === true) {

@@ -1,8 +1,14 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     background: darkcyan;
 }
 
-canvas {
+#canvas {
     border: 1px solid black;
     background: white;
+    /*width: 600px;*/
+    /*height: 600px;*/
 }
