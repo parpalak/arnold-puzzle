@@ -12,7 +12,7 @@ const m = 1;
 const k_spring = 0.0;
 const q2 = 0.1;
 const k_elastic = 10.0;
-const k_friction = 1.0;
+const k_friction = 2.8;
 const infinity = 1000;
 
 class Point {
@@ -38,7 +38,17 @@ class Point {
     k_vx = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
     k_vy = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
 
-    lines = [];
+    /**
+     * @type {Line[]}
+     * @private
+     */
+    _lines = [];
+
+    /**
+     * @type {Polygon[]}
+     * @private
+     */
+    _polygons = [];
 
     constructor(x, y) {
         this.rx = x;
@@ -91,8 +101,41 @@ class Point {
         return sqr(this.stored_vx) + sqr(this.stored_vy);
     }
 
+    /**
+     * @returns {Line[]}
+     */
+    get lines() {
+        return this._lines;
+    }
+
+    /**
+     * @param {Line} line
+     */
     addLine(line) {
-        this.lines.push(line);
+        this._lines.push(line);
+    }
+
+    /**
+     * @returns {Polygon[]}
+     */
+    get polygons() {
+        return this._polygons;
+    }
+
+    /**
+     * @param {Polygon} polygon
+     */
+    addPolygon(polygon) {
+        this._polygons.push(polygon);
+
+        return this;
+    }
+
+    /**
+     * @param {Polygon} polygon
+     */
+    removePolygon(polygon) {
+        this._polygons = this._polygons.filter(pl => pl !== polygon);
     }
 
     /**
@@ -162,6 +205,24 @@ class Line {
         point.addLine(this);
     }
 
+    flip(...points) {
+        const ptSet = new Set(points);
+        let idx1;
+
+        for (let i = this._points.length; i--;) {
+            const point = this._points[i];
+            if (ptSet.has(point)) {
+                if (!idx1) {
+                    idx1 = i;
+                } else {
+                    this._points[i] = this._points[idx1];
+                    this._points[idx1] = point;
+                    break;
+                }
+            }
+        }
+    }
+
     /**
      * @param {number} k_elastic
      * @returns {number}
@@ -209,7 +270,7 @@ class Field {
      * Step or upper limit to floating step.
      * @type {number}
      */
-    dt = 0.01;
+    dt = 0.1;
 
     time_step = 1.0;
     new_time_step = 1.0;
@@ -239,6 +300,24 @@ class Field {
         this._iterations = 0;
 
         return iterations;
+    }
+
+    /**
+     * Upper estimate for the black regions
+     * @returns {number}
+     */
+    darkPolygonNumLimit() {
+        const n = this.lineNum;
+        const k = n*(n-1) / 2 - this.generatorNum;
+
+        return Math.floor((n*n + n - 2*k)/3);
+    }
+
+    /**
+     * @returns {number}
+     */
+    darkPolygonNum() {
+        return this._polygons.filter(polygon => polygon.parity).length;
     }
 
     parseGenerators(generators) {
@@ -275,8 +354,7 @@ class Field {
         /** @type {Polygon[]} */
         let topPolygons = [];
         for (i = -1; i < this.lineNum; i++) {
-            // TODO учесть знак s
-            topPolygons[i] = polygons[i] = new Polygon(Math.abs(i) % 2);
+            topPolygons[i] = polygons[i] = (new Polygon(this.getGeneratorParity(i))).markAsExternal();
         }
 
         // Парсим генераторы
@@ -298,15 +376,15 @@ class Field {
 
             const polygon = polygons[generator];
             polygon.addLeftPoint(point);
-            if (polygon.isClosed || polygon === topPolygons[generator]) {
-                if (polygon !== topPolygons[generator]) {
-                    polygon.addTopPointsAndClose();
-                    this._polygons.push(polygon);
-                }
-
-                polygons[generator] = new Polygon(Math.abs(generator) % 2);
-                polygons[generator].addLeftPoint(point);
+            if (polygon !== topPolygons[generator]) {
+                // Top polygons will be added later
+                polygon.addTopPointsAndClose();
+                this._polygons.push(polygon);
             }
+
+            polygons[generator] = new Polygon(this.getGeneratorParity(generator));
+            polygons[generator].addLeftPoint(point);
+
             polygons[generator - 1].addRightPoint(point);
             polygons[generator + 1].addLeftPoint(point);
         }
@@ -359,9 +437,15 @@ class Field {
         }
 
         for (i = -1; i < this.lineNum; i++) {
-            polygons[i].addTopPointsAndClose();
-            this._polygons.push(polygons[i]);
+            this._polygons.push(polygons[i]
+                .addTopPointsAndClose()
+                .markAsExternal()
+            );
         }
+    }
+
+    getGeneratorParity(i) {
+        return (i % 2 === 0) === (this.s < 0);
     }
 
     calculateStep() {
@@ -413,22 +497,36 @@ class Field {
         }
     }
 
-    flipTriangle(x, y) {
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {null|Polygon}
+     */
+    findTriangleToFlip(x, y) {
         let nearestDistance2 = sqr(infinity);
+        /** @type {Point} */
         let nearestPoint;
         for (let i = this._points.length; i--;) {
             const pt = this._points[i];
             const distance2 = sqr(x - pt.rx) + sqr(y - pt.ry);
             if (distance2 < nearestDistance2) {
                 nearestDistance2 = distance2;
-                nearestPoint = i;
+                nearestPoint = pt;
             }
         }
 
         if (!nearestPoint) {
-            return;
+            return null;
+        }
+        const polygons = nearestPoint.polygons;
+
+        for (let i = polygons.length; i--; ) {
+            const polygon = polygons[i];
+            if (polygon.getCount() === 3 && polygon.contains(x, y) && !polygon.external) {
+                return polygon;
+            }
         }
 
-
+        return null;
     }
 }

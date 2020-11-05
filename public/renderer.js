@@ -10,9 +10,10 @@ class Renderer {
     _canvasY = 0;
     _fps = 0;
 
-    constructor(eCanvas, field) {
+    constructor(eCanvas, field, scoreCallback) {
         this.eCanvas = eCanvas;
         this._field = field;
+        this._scoreCallback = scoreCallback;
     }
 
     /**
@@ -26,13 +27,42 @@ class Renderer {
 
     _isRunning = false;
 
+    _skippedFrame = 120;
+    _flippingPolygon = null;
+
     processFrame() {
-        this._field.calculateStep();
-        this._field.calculateStep();
-        // console.log(this._field.w_pot + this._field.w_kin * 0.5, this._field.w_pot, this._field.w_kin * 0.5);
-        this.drawFrame();
-        this._fps++;
-        if (this._isRunning) {
+        if (this._flippingPolygon !== null) {
+            // Animation for flipping triangle
+            const finalProgress = 1.7;
+            const frameNum = 8;
+
+            this._flippingPolygon.i++;
+            if (this._flippingPolygon.i === frameNum/2) {
+                this._flippingPolygon.polygon.flip();
+                this._scoreCallback(this._field.darkPolygonNum());
+            }
+            if (this._flippingPolygon.i >= frameNum) {
+                this._flippingPolygon.polygon.resetResize(finalProgress);
+                this._flippingPolygon = null;
+
+                // Prevent freeze
+                this._skippedFrame = 120;
+            } else {
+                this._flippingPolygon.polygon.resize(finalProgress * this._flippingPolygon.i / frameNum, this._flippingPolygon.center);
+            }
+            this.drawFrame();
+
+        } else if (this._field.w_kin * 0.5 > 0.001 || this._skippedFrame++ > 60) {
+            // Physics animation.
+            // Slow down speed when kinetic energy is low and the configuration is almost stopped.
+            this._skippedFrame = 0;
+            this._field.calculateStep();
+            this._field.calculateStep();
+            this.drawFrame();
+            this._fps++;
+        }
+
+        if (this._isRunning || this._flippingPolygon !== null) {
             window.requestAnimationFrame(() => {
                 this.processFrame();
             });
@@ -64,6 +94,8 @@ class Renderer {
         ctx.clearRect(0, 0, canvasWidth, canvasHeight);
         ctx.save();
 
+        ctx.globalAlpha = 0.8;
+
         /**
          * Canvas methods for direct transform from system to screen coordinates
          */
@@ -87,15 +119,14 @@ class Renderer {
         const polygons = this._field.polygons;
         for (let i = polygons.length; i--; ) {
             const polygon = polygons[i];
-            // if (polygon.parity) {
-            //     continue;
-            // }
+            if (!polygon.parity && polygon.getCount() >= 4) {
+                continue;
+            }
 
             const polygonPoints = polygon.points;
             const pt = polygonPoints[polygonPoints.length - 1];
 
-            ctx.fillStyle = polygon.color || (polygon.color = getRandomColor());
-            ctx.strokeStyle = polygon.color || (polygon.color = getRandomColor());
+            ctx.fillStyle = polygon.parity ? (polygon.getCount() === 3 ? '#001a3b' : '#15003b') : (polygon.getCount() < 4 ? '#aed099' : '#89c6af');
 
             ctx.beginPath();
             ctx.moveTo(pt.rx, pt.ry);
@@ -105,14 +136,14 @@ class Renderer {
                 ctx.lineTo(pt.rx, pt.ry);
             }
             ctx.closePath();
-            // ctx.stroke();
             ctx.fill();
-
         }
 
         /**
          * Draw lines
          */
+        // ctx.fillStyle = '#000';
+        // ctx.font = "1px serif";
         // const lines = this._field.lines;
         // for (let i = lines.length; i--;) {
         //     const line = lines[i];
@@ -120,6 +151,7 @@ class Renderer {
         //     const pt = linePoints[linePoints.length - 1];
         //
         //     ctx.strokeStyle = line.color;
+        //     ctx.fillStyle = line.color;
         //
         //     ctx.beginPath();
         //     ctx.moveTo(pt.rx, pt.ry);
@@ -127,6 +159,12 @@ class Renderer {
         //         const pt = linePoints[j];
         //
         //         ctx.lineTo(pt.rx, pt.ry);
+        //         // if (i=== 1)
+        //         //     ctx.fillText(j, pt.rx, pt.ry - 0.5);
+        //         // if (i=== 3)
+        //         //     ctx.fillText(j, pt.rx, pt.ry+ 1);
+        //         // if (i=== 2)
+        //             ctx.fillText(j, pt.rx, pt.ry + i *0.5);
         //     }
         //     ctx.stroke();
         // }
@@ -139,6 +177,9 @@ class Renderer {
      */
     changeZoom(zoomDirection) {
         this._zoom *= Math.exp(zoomDirection * 0.2);
+        if (this._zoom < 1) {
+            this._zoom = 1;
+        }
     }
 
     /**
@@ -150,6 +191,13 @@ class Renderer {
         const x = (canvasX - this.eCanvas.width * 0.5 - this._canvasX) / this._zoom;
         const y = - (canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
 
-        this._field.flipTriangle(x, y);
+        const polygon = this._field.findTriangleToFlip(x, y);
+        if (polygon !== null) {
+            this._flippingPolygon = {
+                center: polygon.getCenter(),
+                polygon,
+                i: 0,
+            }
+        }
     }
 }

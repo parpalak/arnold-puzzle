@@ -2,17 +2,19 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Arnold' puzzle</title>
+    <title>Arnold's Puzzle</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch&display=swap" rel="stylesheet">
 </head>
 <body>
-<h1>Arnold' puzzle</h1>
-<p>
-    <button onclick="renderer.toggleRun()">Run</button>
-</p>
-
-<canvas id="canvas" width="600" height="600"></canvas>
+<canvas id="canvas"></canvas>
+<div id="head">
+    <h1>Arnold's Puzzle</h1>
+    <div class="score"> </div>
+    <div class="goal">Dark regions: <span id="score"></span>/<span id="goal"></span></div>
+</div>
 <p id="info"></p>
+<p id="instruction">Click triangles to flip. Get the maximum number of dark regions.</p>
 <script src="utils.js"></script>
 <script src="model.js"></script>
 <script src="polygon.js"></script>
@@ -21,10 +23,23 @@
     const eCanvas = document.getElementById('canvas');
     const field = new Field();
     // field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0]);
-    field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0, 4, 3, 2, 1, 0, 5, 4, 3, 2, 1, 0, 6, 5, 4, 3, 2, 1, 0, 7, 6, 5, 4, 3, 2, 1]);
+    field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0,
+        4, 3, 2, 1, 0,
+        5, 4, 3, 2, 1, 0,
+        6, 5, 4, 3, 2, 1, 0,
+        7, 6, 5, 4, 3, 2, 1, 0,
+        // 8, 7, 6, 5, 4, 3, 2, 1, 0,
+        // 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+        // 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+        // 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+        // 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+        // 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+    ]);
     // field.parseGenerators([1, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 3, 5, 7, 6, 5, 4, 3, 2, 1, 3, 5, 7, 8, 7, 6, 5, 4, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 5, 4, 5, 7, 6, 5, 7, 9, 8, 7, 9]);
 
-    const renderer = new Renderer(eCanvas, field);
+    recalcScore();
+
+    const renderer = new Renderer(eCanvas, field, recalcScore);
     renderer.drawFrame();
 
     eCanvas.addEventListener('wheel', function (e) {
@@ -60,14 +75,34 @@
             y = e.offsetY;
         }
     });
+
     setInterval(() => {
-        document.getElementById('info').innerHTML = 'E: ' + (field.w_pot + field.w_kin)
-            + '<br>W: ' + field.w_pot
-            + '<br>K: ' + field.w_kin
-            + '<br>fps: ' + renderer.fps
-            + '<br>itns: ' + field.iterations
-        ;
+        document.getElementById('info').innerHTML = [
+            'E: ' + (field.w_pot + field.w_kin*0.5).toFixed(6)
+            , 'W: ' + field.w_pot.toFixed(6)
+            , 'K: ' + (field.w_kin*0.5).toFixed(6)
+            , 'fps: ' + renderer.fps
+//            , 'itns: ' + field.iterations
+        ].map(val => '<span class="parameter">' + val + '</span>').join(' ');
     }, 1000);
+
+    function resizeHandler() {
+        eCanvas.width = eCanvas.offsetWidth;
+        eCanvas.height = eCanvas.offsetHeight;
+        console.log(eCanvas.offsetWidth, eCanvas.offsetHeight);
+        renderer.drawFrame();
+    }
+
+    window.addEventListener('resize', resizeHandler);
+    document.addEventListener('readystatechange', resizeHandler);
+
+    function recalcScore(score) {
+        document.getElementById('score').innerHTML = score || field.darkPolygonNum();
+    }
+
+    document.getElementById('goal').innerHTML = field.darkPolygonNumLimit();
+
+    renderer.toggleRun();
 </script>
 </body>
 </html>
