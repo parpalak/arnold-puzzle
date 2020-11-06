@@ -50,11 +50,24 @@ class Point {
      */
     _polygons = [];
 
+    /**
+     * @param {number} x
+     * @param {number} y
+     */
     constructor(x, y) {
         this.rx = x;
         this.ry = y;
         this.stored_rx = x;
         this.stored_ry = y;
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {number}
+     */
+    squaredDistanceFrom(x, y) {
+        return sqr(x - this.rx) + sqr(y - this.ry);
     }
 
     /**
@@ -132,6 +145,22 @@ class Point {
     }
 
     /**
+     * @param {number} x
+     * @param {number} y
+     * @returns {null|Polygon}
+     */
+    getPolygonContaining(x, y) {
+        for (let i = this._polygons.length; i--;) {
+            const polygon = this._polygons[i];
+            if (polygon.contains(x, y)) {
+                return polygon;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param {Polygon} polygon
      */
     removePolygon(polygon) {
@@ -203,6 +232,27 @@ class Line {
     prependPoint(point) {
         this._points.unshift(point);
         point.addLine(this);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     */
+    getClosestPoint(x, y) {
+        let nearestDistance2 = sqr(infinity);
+
+        /** @type {Point} */
+        let nearestPoint = null;
+        for (let i = this._points.length; i--;) {
+            const pt = this._points[i];
+            const distance2 = pt.squaredDistanceFrom(x, y);
+            if (distance2 < nearestDistance2) {
+                nearestDistance2 = distance2;
+                nearestPoint = pt;
+            }
+        }
+
+        return nearestPoint;
     }
 
     flip(...points) {
@@ -308,9 +358,9 @@ class Field {
      */
     darkPolygonNumLimit() {
         const n = this.lineNum;
-        const k = n*(n-1) / 2 - this.generatorNum;
+        const k = n * (n - 1) / 2 - this.generatorNum;
 
-        return Math.floor((n*n + n - 2*k)/3);
+        return Math.floor((n * n + n - 2 * k) / 3);
     }
 
     /**
@@ -498,35 +548,82 @@ class Field {
     }
 
     /**
+     * @type {null|Point}
+     * @private
+     */
+    _cachedPointCloseToCursor = null;
+
+    /**
+     * @type {null|Polygon}
+     * @private
+     */
+    _cachedPolygonAtCursor = null;
+
+    /**
      * @param {number} x
      * @param {number} y
      * @returns {null|Polygon}
      */
     findTriangleToFlip(x, y) {
+        if (this._cachedPolygonAtCursor && this._cachedPolygonAtCursor.contains(x, y)) {
+            return this._cachedPolygonAtCursor.isClickable() ? this._cachedPolygonAtCursor : null;
+        }
+
+        if (this._cachedPointCloseToCursor) {
+            const possibleNearestPoint = this.getPossibleNearestPoint(this._cachedPointCloseToCursor, x, y);
+
+            const polygon = possibleNearestPoint.getPolygonContaining(x, y);
+            if (polygon !== null) {
+                this._cachedPolygonAtCursor = polygon;
+
+                return (polygon.isClickable()) ? polygon : null;
+            }
+        }
+
         let nearestDistance2 = sqr(infinity);
         /** @type {Point} */
         let nearestPoint;
         for (let i = this._points.length; i--;) {
             const pt = this._points[i];
-            const distance2 = sqr(x - pt.rx) + sqr(y - pt.ry);
+            const distance2 = pt.squaredDistanceFrom(x, y);
             if (distance2 < nearestDistance2) {
                 nearestDistance2 = distance2;
                 nearestPoint = pt;
             }
         }
 
+        this._cachedPointCloseToCursor = nearestPoint;
+
         if (!nearestPoint) {
             return null;
         }
-        const polygons = nearestPoint.polygons;
 
-        for (let i = polygons.length; i--; ) {
-            const polygon = polygons[i];
-            if (polygon.getCount() === 3 && polygon.contains(x, y) && !polygon.external) {
-                return polygon;
+        const polygon = nearestPoint.getPolygonContaining(x, y);
+        this._cachedPolygonAtCursor = polygon;
+
+        return (polygon !== null && polygon.isClickable()) ? polygon : null;
+    }
+
+    /**
+     * @param {Point} point
+     * @param {number} x
+     * @param {number} y
+     * @returns {Point}
+     */
+    getPossibleNearestPoint(point, x, y) {
+        let currentLine = point.lines[0];
+        let currentPt = currentLine.getClosestPoint(x, y);
+
+        while (true) {
+            let newLine = (currentLine === currentPt.lines[0]) ? currentPt.lines[1] : currentPt.lines[0];
+            let newPt = newLine.getClosestPoint(x, y);
+            if (newPt === currentPt) {
+                break;
             }
+            currentLine = newLine;
+            currentPt = newPt;
         }
 
-        return null;
+        return currentPt;
     }
 }

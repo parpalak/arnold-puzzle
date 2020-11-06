@@ -37,7 +37,7 @@ class Renderer {
             const frameNum = 8;
 
             this._flippingPolygon.i++;
-            if (this._flippingPolygon.i === frameNum/2) {
+            if (this._flippingPolygon.i === frameNum / 2) {
                 this._flippingPolygon.polygon.flip();
                 this._scoreCallback(this._field.darkPolygonNum());
             }
@@ -106,18 +106,18 @@ class Renderer {
         /**
          * Draw force vectors
          */
-        // ctx.strokeStyle = '#f55';
-        // const allPoints = this._field.points;
-        // for (let i = 0; i < allPoints.length; i++) {
-        //     const pt = allPoints[i];
-        //     ctx.beginPath();
-        //     ctx.moveTo(pt.rx, pt.ry);
-        //     ctx.lineTo(pt.rx + pt.fx, pt.ry + pt.fy);
-        //     ctx.stroke();
-        // }
+            // ctx.strokeStyle = '#f55';
+            // const allPoints = this._field.points;
+            // for (let i = 0; i < allPoints.length; i++) {
+            //     const pt = allPoints[i];
+            //     ctx.beginPath();
+            //     ctx.moveTo(pt.rx, pt.ry);
+            //     ctx.lineTo(pt.rx + pt.fx, pt.ry + pt.fy);
+            //     ctx.stroke();
+            // }
 
         const polygons = this._field.polygons;
-        for (let i = polygons.length; i--; ) {
+        for (let i = polygons.length; i--;) {
             const polygon = polygons[i];
             if (!polygon.parity && polygon.getCount() >= 4) {
                 continue;
@@ -189,7 +189,7 @@ class Renderer {
     doClick(canvasX, canvasY) {
         // Reverse transform from screen to system coordinates
         const x = (canvasX - this.eCanvas.width * 0.5 - this._canvasX) / this._zoom;
-        const y = - (canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
+        const y = -(canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
 
         const polygon = this._field.findTriangleToFlip(x, y);
         if (polygon !== null) {
@@ -199,5 +199,18 @@ class Renderer {
                 i: 0,
             }
         }
+    }
+
+    /**
+     * @param {number} canvasX
+     * @param {number} canvasY
+     */
+    canClick(canvasX, canvasY) {
+        // Reverse transform from screen to system coordinates
+        const x = (canvasX - this.eCanvas.width * 0.5 - this._canvasX) / this._zoom;
+        const y = -(canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
+
+        const polygon = this._field.findTriangleToFlip(x, y);
+        return polygon !== null;
     }
 }

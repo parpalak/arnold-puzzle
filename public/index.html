@@ -10,11 +10,16 @@
 <canvas id="canvas"></canvas>
 <div id="head">
     <h1>Arnold's Puzzle</h1>
-    <div class="score"> </div>
+    <div class="score"></div>
     <div class="goal">Dark regions: <span id="score"></span>/<span id="goal"></span></div>
 </div>
-<p id="info"></p>
-<p id="instruction">Click triangles to flip. Get the maximum number of dark regions.</p>
+<div id="bottom">
+    <div id="info">
+        <span onclick="if (event.ctrlKey) {displayDebugInfo();}">© 2020</span>
+        <a class="link" id="mailto-link" title="Drop me a line" href="mailto:roman%40written.ru">Roman Parpalak</a>
+    </div>
+    <div id="instruction">Click triangles to flip. Get the maximum number of dark regions.</div>
+</div>
 <script src="utils.js"></script>
 <script src="model.js"></script>
 <script src="polygon.js"></script>
@@ -59,12 +64,12 @@
     });
     eCanvas.addEventListener('mouseup', function (e) {
         mousePressed = false;
-        if (Math.abs(e.offsetX - clickX) < 3 && Math.abs(e.offsetY - clickY) < 3) {
+        if (e.button === 0 && Math.abs(e.offsetX - clickX) < 3 && Math.abs(e.offsetY - clickY) < 3) {
             renderer.doClick(e.offsetX, e.offsetY);
         }
     });
     eCanvas.addEventListener('mousemove', function (e) {
-        if (mousePressed === true) {
+        if (mousePressed) {
             if (e.buttons % 2 === 0) {
                 mousePressed = false;
                 return;
@@ -73,23 +78,29 @@
             renderer.drawFrame();
             x = e.offsetX;
             y = e.offsetY;
+        } else {
+            this.style.cursor = renderer.canClick(e.offsetX, e.offsetY) ? 'pointer' : 'default';
         }
     });
 
-    setInterval(() => {
-        document.getElementById('info').innerHTML = [
-            'E: ' + (field.w_pot + field.w_kin*0.5).toFixed(6)
-            , 'W: ' + field.w_pot.toFixed(6)
-            , 'K: ' + (field.w_kin*0.5).toFixed(6)
-            , 'fps: ' + renderer.fps
+    function displayDebugInfo() {
+        const eInfo = document.getElementById('info');
+        if (eInfo) {
+            eInfo.innerHTML = [
+                'E: ' + (field.w_pot + field.w_kin * 0.5).toFixed(6)
+                , 'W: ' + field.w_pot.toFixed(6)
+                , 'K: ' + (field.w_kin * 0.5).toFixed(6)
+                , 'fps: ' + renderer.fps
 //            , 'itns: ' + field.iterations
-        ].map(val => '<span class="parameter">' + val + '</span>').join(' ');
-    }, 1000);
+            ].map(val => '<span class="parameter">' + val + '</span>').join(' ');
+
+            setTimeout(displayDebugInfo, 1000);
+        }
+    }
 
     function resizeHandler() {
         eCanvas.width = eCanvas.offsetWidth;
         eCanvas.height = eCanvas.offsetHeight;
-        console.log(eCanvas.offsetWidth, eCanvas.offsetHeight);
         renderer.drawFrame();
     }
 

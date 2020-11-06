@@ -17,19 +17,23 @@ body {
     color: #9df5f5;
 }
 
-#head {
-    position: relative;
+#head,
+#bottom {
     z-index: 1;
     display: flex;
     align-items: baseline;
-    flex-wrap: wrap;
     padding: 0 10px;
+    pointer-events: none;
+    }
+#head {
+    flex-wrap: wrap;
+    position: relative;
     }
     h1 {
         margin: 0;
-        pointer-events: none;
         font-size: 2em;
         flex: 1 0 auto;
+        line-height: 1.5;
         }
     .score {
         font-size: 2em;
@@ -45,24 +49,26 @@ body {
         flex: 0 0 auto;
         }
 
-#instruction {
+#bottom {
     position: absolute;
-    z-index: 1;
-    margin: 0.5em;
-    bottom: 0;
+    flex-wrap: wrap-reverse;
+    justify-content: space-between;
+    left: 0;
+    bottom: 8px;
     right: 0;
-}
+    }
 #info {
-    position: absolute;
-    z-index: 1;
-    bottom: 0;
-    margin: 0.5em;
+    pointer-events: auto;
     }
     .parameter {
         width: 100px;
         display: inline-block;
         white-space: nowrap;
         }
+a {
+    color: #9df5f5 !important;
+    text-decoration-color: rgba(157, 245, 245, 0.45);
+}
 
 #canvas {
     position: absolute;

@@ -173,6 +173,10 @@ class Polygon {
         }
     }
 
+    isClickable() {
+        return this._points.length === 3 && !this._external;
+    }
+
     flip() {
         if (this._external) {
             // One cannot flip an external triangle.
@@ -223,8 +227,7 @@ class Polygon {
     getCenter() {
         const n = this._points.length;
         const x = (1.0 / n) * this._points.reduce((partial_sum, pt) => partial_sum + pt.stored_rx, 0.0);
-        const y = (1.0 / n) * this._points.reduce((partial_sum, pt) => { console.log(partial_sum, pt.stored_ry); return  partial_sum + pt.stored_ry; }, 0.0);
-        console.log(x, y, this._points);
+        const y = (1.0 / n) * this._points.reduce((partial_sum, pt) => partial_sum + pt.stored_ry, 0.0);
 
         return {x, y};
     }
