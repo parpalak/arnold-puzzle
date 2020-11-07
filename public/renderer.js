@@ -9,6 +9,7 @@ class Renderer {
     _canvasX = 0;
     _canvasY = 0;
     _fps = 0;
+    _isDebug = false;
 
     /**
      * @param eCanvas
@@ -19,6 +20,10 @@ class Renderer {
         this.eCanvas = eCanvas;
         this._field = field;
         this._scoreCallback = scoreCallback;
+    }
+
+    markAsDebug() {
+        this._isDebug = true;
     }
 
     /**
@@ -124,14 +129,36 @@ class Renderer {
         const polygons = this._field.polygons;
         for (let i = polygons.length; i--;) {
             const polygon = polygons[i];
-            if (!polygon.parity && polygon.getCount() >= 4) {
-                continue;
+            if (!this._isDebug && !polygon.parity && polygon.getCount() >= 4) {
+                 continue;
             }
 
             const polygonPoints = polygon.points;
             const pt = polygonPoints[polygonPoints.length - 1];
 
-            ctx.fillStyle = polygon.parity ? (polygon.getCount() === 3 ? '#001a3b' : '#15003b') : (polygon.getCount() < 4 ? '#aed099' : '#89c6af');
+            if (polygon.parity) {
+                ctx.fillStyle = polygon.getCount() === 3 ? '#001a3b' : '#15003b';
+            } else {
+                switch (polygon.getCount()) {
+                    case 3:
+                        ctx.fillStyle = '#aed099';
+                        break;
+                    case 4:
+                        ctx.fillStyle = '#c1824b';
+                        break;
+                    case 5:
+                        ctx.fillStyle = '#458a69';
+                        break;
+                    case 7:
+                        ctx.fillStyle = '#ce89d6';
+                        break;
+                    case 8:
+                        ctx.fillStyle = '#4044cd';
+                        break;
+                    default:
+                        continue;
+                }
+            }
 
             ctx.beginPath();
             ctx.moveTo(pt.rx, pt.ry);

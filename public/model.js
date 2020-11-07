@@ -567,7 +567,7 @@ class Field {
     }
 
     getGeneratorParity(i) {
-        return (i % 2 === 0) === (this.s < 0);
+        return (i % 2 === 0) /*=== (this.s <= 0)*/;
     }
 
     calculateStep() {

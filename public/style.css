@@ -17,10 +17,51 @@ body {
     color: #9df5f5;
 }
 
+button {
+    font-size: 16px;
+    vertical-align: 5px;
+    line-height: 1;
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    color: #9df5f5;
+    border: 1px solid #9df5f5;
+    border-width: 2px 0;
+    position: relative;
+    width: 19px;
+    height: 23px;
+    pointer-events: auto;
+    }
+    button:hover {
+        cursor: pointer;
+        }
+    button:focus {
+        background-color: rgba(157, 245, 245, 0.2);
+        outline: none;
+        }
+    button:before,
+    button:after {
+        content: '';
+        border: 2px solid transparent;
+        width: 0;
+        height: 100%;
+        position: absolute;
+        top: -2px;
+        }
+    button:before {
+        border-right-color: #9df5f5;
+        left: -4px;
+        }
+    button:after {
+        border-left-color: #9df5f5;
+        right: -4px;
+        }
+
 #head,
 #bottom {
     z-index: 1;
     display: flex;
+    justify-content: space-between;
     align-items: baseline;
     padding: 0 10px;
     pointer-events: none;
@@ -31,28 +72,26 @@ body {
     }
     h1 {
         margin: 0;
-        font-size: 2em;
-        flex: 1 0 auto;
+        font-size: 33px;
         line-height: 1.5;
         }
-    .score {
-        font-size: 2em;
-        flex: 0 0 170px;
+    .lines-control, .goal {
+        font-size: 33px;
+        pointer-events: auto;
         }
+        .lines-control button {
+            margin: 0 3px;
+            vertical-align: 6px;
+            }
         #score {
             min-width: 39px;
             display: inline-block;
             text-align: center;
             }
-    .goal {
-        font-size: 2em;
-        flex: 0 0 auto;
-        }
 
 #bottom {
     position: absolute;
     flex-wrap: wrap-reverse;
-    justify-content: space-between;
     left: 0;
     bottom: 8px;
     right: 0;

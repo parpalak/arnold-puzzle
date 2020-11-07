@@ -9,13 +9,20 @@
 <body>
 <canvas id="canvas"></canvas>
 <div id="head">
-    <h1>Arnold's Puzzle</h1>
-    <div class="score"></div>
+    <h1>Arnold's Puzzle
+        <button id="help">?</button>
+    </h1>
+    <div class="lines-control">
+        Lines:
+        <button id="minus">−</button>
+        <span id="line-num"></span>
+        <button id="plus">+</button>
+    </div>
     <div class="goal">Dark regions: <span id="score"></span>/<span id="goal"></span></div>
 </div>
 <div id="bottom">
     <div id="info">
-        <span onclick="if (event.ctrlKey) {displayDebugInfo();}">© 2020</span>
+        <span onclick="if (event.ctrlKey) { displayDebugInfo(); renderer.markAsDebug(); }">© 2020</span>
         <a class="link" id="mailto-link" title="Drop me a line" href="mailto:roman%40written.ru">Roman Parpalak</a>
     </div>
     <div id="instruction">Click triangles to flip. Get the maximum number of dark regions.</div>
@@ -27,30 +34,48 @@
 <script>
     const eCanvas = document.getElementById('canvas');
     const field = new Field();
-    const n = localStorage.getItem('current_n');
-    if (n) {
-        field.setState(JSON.parse(localStorage.getItem('stored_' + n)));
-    } else {
-        // field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0]);
-        field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0,
-            4, 3, 2, 1, 0,
-            5, 4, 3, 2, 1, 0,
-            6, 5, 4, 3, 2, 1, 0,
-            7, 6, 5, 4, 3, 2, 1, 0,
-            // 8, 7, 6, 5, 4, 3, 2, 1, 0,
-            // 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-            // 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-            // 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-            // 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-            // 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-        ]);
-        // field.parseGenerators([1, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 3, 5, 7, 6, 5, 4, 3, 2, 1, 3, 5, 7, 8, 7, 6, 5, 4, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 5, 4, 5, 7, 6, 5, 7, 9, 8, 7, 9]);
+    const renderer = new Renderer(eCanvas, field, recalcScore);
+
+    let n = Number(localStorage.getItem('current_n') || 9);
+
+    document.getElementById('plus').addEventListener('click', (e) => {
+        if (n < 33) {
+            localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
+            localStorage.setItem('current_n', String(field.lineNum));
+            n += 2;
+            changeLineNumTo(n);
+        }
+    });
+    document.getElementById('minus').addEventListener('click', (e) => {
+        if (n >= 5) {
+            localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
+            localStorage.setItem('current_n', String(field.lineNum));
+            n -= 2;
+            changeLineNumTo(n);
+        }
+    });
+
+    function changeLineNumTo(n) {
+        const storedState = localStorage.getItem('stored_' + n);
+        if (storedState) {
+            field.setState(JSON.parse(storedState));
+        } else {
+            const generators = [];
+            for (let i = 0; i < n; i++) {
+                for (let j = i; j--;) {
+                    generators.push(j);
+                }
+            }
+            field.parseGenerators(generators);
+        }
+
+        document.getElementById('line-num').innerHTML = String(n);
+        document.getElementById('goal').innerHTML = String(field.darkPolygonNumLimit());
+        renderer.drawFrame();
+        recalcScore();
     }
 
-    recalcScore();
-
-    const renderer = new Renderer(eCanvas, field, recalcScore);
-    renderer.drawFrame();
+    changeLineNumTo(n);
 
     eCanvas.addEventListener('wheel', function (e) {
         let delta = e.deltaY || e.detail;
@@ -119,8 +144,6 @@
     function recalcScore(score) {
         document.getElementById('score').innerHTML = score || field.darkPolygonNum();
     }
-
-    document.getElementById('goal').innerHTML = field.darkPolygonNumLimit();
 
     renderer.toggleRun();
 </script>
