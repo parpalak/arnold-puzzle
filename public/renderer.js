@@ -10,6 +10,11 @@ class Renderer {
     _canvasY = 0;
     _fps = 0;
 
+    /**
+     * @param eCanvas
+     * @param {Field} field
+     * @param scoreCallback
+     */
     constructor(eCanvas, field, scoreCallback) {
         this.eCanvas = eCanvas;
         this._field = field;
@@ -210,7 +215,6 @@ class Renderer {
         const x = (canvasX - this.eCanvas.width * 0.5 - this._canvasX) / this._zoom;
         const y = -(canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
 
-        const polygon = this._field.findTriangleToFlip(x, y);
-        return polygon !== null;
+        return this._field.findTriangleToFlip(x, y) !== null;
     }
 }

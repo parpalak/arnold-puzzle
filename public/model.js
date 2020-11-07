@@ -55,6 +55,14 @@ class Point {
      * @param {number} y
      */
     constructor(x, y) {
+        this.setState(x, y);
+    }
+
+    /**
+     * @param {number} x
+     * @param {number} y
+     */
+    setState(x, y) {
         this.rx = x;
         this.ry = y;
         this.stored_rx = x;
@@ -220,6 +228,14 @@ class Line {
         return this._points;
     }
 
+    /**
+     * @param {number} index
+     * @returns {Point|null}
+     */
+    getInternalPoint(index) {
+        return index > 0 && index < this._points.length - 1 ? this._points[index] : null;
+    }
+
     get color() {
         return this._color;
     }
@@ -370,7 +386,13 @@ class Field {
         return this._polygons.filter(polygon => polygon.parity).length;
     }
 
+    /**
+     * @param {number[]} generators
+     */
     parseGenerators(generators) {
+        this._cachedPointCloseToCursor = null;
+        this._cachedPolygonAtCursor = null;
+
         let i;
         this.generatorNum = generators.length;
 
@@ -409,6 +431,7 @@ class Field {
 
         // Парсим генераторы
         this._points = [];
+        this._polygons = [];
         for (i = 0; i < this.generatorNum; i++) {
             const generator = generators[i];
 
@@ -492,6 +515,55 @@ class Field {
                 .markAsExternal()
             );
         }
+    }
+
+    getState() {
+        const rearrangement = [];
+        const pointIndexOfLine = [];
+        for (let i = this.lineNum; i--;) {
+            rearrangement[i] = i;
+
+            // 1 because of skipping external points
+            pointIndexOfLine[i] = 1;
+        }
+
+        const pointData = [];
+        while (pointData.length < this.generatorNum) {
+            for (let i = 0; i < this.lineNum - 1; i++) {
+                const thisLineIndex = rearrangement[i];
+                const thisLine = this._lines[thisLineIndex];
+                const thisPoint = thisLine.getInternalPoint(pointIndexOfLine[thisLineIndex]);
+                if (thisPoint === null) {
+                    continue;
+                }
+
+                const nextLineIndex = rearrangement[i + 1];
+                const nextLine = this._lines[nextLineIndex];
+                const nextPoint = nextLine.getInternalPoint(pointIndexOfLine[nextLineIndex]);
+                if (nextPoint === null) {
+                    continue;
+                }
+
+                if (thisPoint === nextPoint) {
+                    rearrangement[i] = nextLineIndex;
+                    rearrangement[i+1] = thisLineIndex;
+
+                    pointData.push({g: i, x: thisPoint.rx, y: thisPoint.ry});
+                    pointIndexOfLine[thisLineIndex]++;
+                    pointIndexOfLine[nextLineIndex]++;
+                    i++;
+                }
+            }
+        }
+
+        return pointData;
+    }
+
+    setState(state) {
+        this.parseGenerators(state.map(item => item.g));
+        state.forEach((pt, i) => {
+            this._points[i].setState(pt.x, pt.y);
+        });
     }
 
     getGeneratorParity(i) {

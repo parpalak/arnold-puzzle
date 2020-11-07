@@ -27,20 +27,25 @@
 <script>
     const eCanvas = document.getElementById('canvas');
     const field = new Field();
-    // field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0]);
-    field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0,
-        4, 3, 2, 1, 0,
-        5, 4, 3, 2, 1, 0,
-        6, 5, 4, 3, 2, 1, 0,
-        7, 6, 5, 4, 3, 2, 1, 0,
-        // 8, 7, 6, 5, 4, 3, 2, 1, 0,
-        // 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-        // 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-        // 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-        // 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-        // 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
-    ]);
-    // field.parseGenerators([1, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 3, 5, 7, 6, 5, 4, 3, 2, 1, 3, 5, 7, 8, 7, 6, 5, 4, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 5, 4, 5, 7, 6, 5, 7, 9, 8, 7, 9]);
+    const n = localStorage.getItem('current_n');
+    if (n) {
+        field.setState(JSON.parse(localStorage.getItem('stored_' + n)));
+    } else {
+        // field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0]);
+        field.parseGenerators([0, 1, 0, 2, 1, 0, 3, 2, 1, 0,
+            4, 3, 2, 1, 0,
+            5, 4, 3, 2, 1, 0,
+            6, 5, 4, 3, 2, 1, 0,
+            7, 6, 5, 4, 3, 2, 1, 0,
+            // 8, 7, 6, 5, 4, 3, 2, 1, 0,
+            // 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+            // 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+            // 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+            // 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+            // 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0,
+        ]);
+        // field.parseGenerators([1, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 3, 5, 7, 6, 5, 4, 3, 2, 1, 3, 5, 7, 8, 7, 6, 5, 4, 3, 5, 7, 9, 8, 7, 6, 5, 4, 3, 2, 1, 3, 5, 4, 5, 7, 6, 5, 7, 9, 8, 7, 9]);
+    }
 
     recalcScore();
 
@@ -51,7 +56,7 @@
         let delta = e.deltaY || e.detail;
 
         if (!e.ctrlKey) {
-            renderer.changeZoom(delta > 0 ? 1 : -1);
+            renderer.changeZoom(delta < 0 ? 1 : -1);
             renderer.drawFrame();
         }
     });
@@ -65,6 +70,10 @@
     eCanvas.addEventListener('mouseup', function (e) {
         mousePressed = false;
         if (e.button === 0 && Math.abs(e.offsetX - clickX) < 3 && Math.abs(e.offsetY - clickY) < 3) {
+            setTimeout(() => {
+                localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
+                localStorage.setItem('current_n', String(field.lineNum));
+            }, 1000);
             renderer.doClick(e.offsetX, e.offsetY);
         }
     });
