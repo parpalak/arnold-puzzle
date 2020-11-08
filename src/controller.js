@@ -72,7 +72,7 @@ eCanvas.addEventListener('wheel', e => {
 
     if (!e.ctrlKey) {
         const zoomDirection = delta < 0 ? 1 : -1;
-        renderer.changeZoom(Math.exp(zoomDirection * 0.2));
+        renderer.changeZoom(Math.exp(zoomDirection * 0.2), e.offsetX, e.offsetY, e.offsetX, e.offsetY);
         renderer.drawFrame();
     }
 });
@@ -151,10 +151,9 @@ eCanvas.addEventListener("touchcancel", e => {
 eCanvas.addEventListener("touchmove", e => {
     e.preventDefault();
 
-    const {dx, dy, k_zoom} = ongoingTouches.applyTouches(e.touches);
+    const {oldX, oldY, newX, newY, kZoom} = ongoingTouches.applyTouches(e.touches);
 
-    renderer.shift(dx, dy);
-    renderer.changeZoom(k_zoom);
+    renderer.changeZoom(kZoom, oldX, oldY, newX, newY);
     renderer.drawFrame();
 }, false);
 

@@ -107,7 +107,8 @@ class Renderer {
         ctx.globalAlpha = 0.8;
 
         /**
-         * Canvas methods for direct transform from system to screen coordinates
+         * Canvas methods for direct transform from system to screen coordinates.
+         * @see changeZoom for the same transform in equations.
          */
         ctx.translate(canvasWidth / 2 + this._canvasX, canvasHeight / 2 + this._canvasY);
         ctx.scale(this._zoom, -this._zoom); // Scale and change the y-axis direction to a Cartesian kind
@@ -130,7 +131,7 @@ class Renderer {
         for (let i = polygons.length; i--;) {
             const polygon = polygons[i];
             if (!this._isDebug && !polygon.parity && polygon.getCount() >= 4) {
-                 continue;
+                continue;
             }
 
             const polygonPoints = polygon.points;
@@ -205,13 +206,28 @@ class Renderer {
     }
 
     /**
-     * @param {number} multiplier
+     * @param {number} kZoom
+     * @param {number} cnvX1 - old screen coords of a point
+     * @param {number} cnvY1
+     * @param {number} cnvX2 - new screen coords of that point
+     * @param {number} cnvY2
      */
-    changeZoom(multiplier) {
-        this._zoom *= multiplier;
-        if (this._zoom < 1) {
-            this._zoom = 1;
-        }
+    changeZoom(kZoom, cnvX1, cnvY1, cnvX2, cnvY2) {
+        const minZoom = 1.0;
+
+        // Maintain minimal zoom
+        kZoom = Math.max(kZoom, minZoom/this._zoom);
+
+        const newZoom = kZoom * this._zoom;
+
+        /**
+         * Direct transform of coordinates.
+         * @see drawFrame for the same transform in terms of canvas zoom and translate.
+         */
+        this._canvasX = cnvX2 - 0.5 * this.eCanvas.width - newZoom * this.getSystemXFromCanvas(cnvX1);
+        this._canvasY = cnvY2 - 0.5 * this.eCanvas.height + newZoom * this.getSystemYFromCanvas(cnvY1);
+
+        this._zoom = newZoom;
     }
 
     /**
@@ -220,8 +236,8 @@ class Renderer {
      */
     doClick(canvasX, canvasY) {
         // Reverse transform from screen to system coordinates
-        const x = (canvasX - this.eCanvas.width * 0.5 - this._canvasX) / this._zoom;
-        const y = -(canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
+        const x = this.getSystemXFromCanvas(canvasX);
+        const y = this.getSystemYFromCanvas(canvasY);
 
         const polygon = this._field.findTriangleToFlip(x, y);
         if (polygon !== null) {
@@ -239,9 +255,26 @@ class Renderer {
      */
     canClick(canvasX, canvasY) {
         // Reverse transform from screen to system coordinates
-        const x = (canvasX - this.eCanvas.width * 0.5 - this._canvasX) / this._zoom;
-        const y = -(canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
+        const x = this.getSystemXFromCanvas(canvasX);
+        const y = this.getSystemYFromCanvas(canvasY);
 
         return this._field.findTriangleToFlip(x, y) !== null;
+    }
+
+    /**
+     * @param {number} canvasX
+     * @returns {number}
+     */
+    getSystemXFromCanvas(canvasX) {
+        return (canvasX - this.eCanvas.width * 0.5 - this._canvasX) / this._zoom;
+    }
+
+    /**
+     *
+     * @param {number} canvasY
+     * @returns {number}
+     */
+    getSystemYFromCanvas(canvasY) {
+        return -(canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
     }
 }

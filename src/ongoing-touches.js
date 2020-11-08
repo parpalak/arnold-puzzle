@@ -35,13 +35,13 @@ class OngoingTouches {
             + sqr(this._touches[1].clientY - this._touches[0].clientY)
         ) : 1.0;
 
-        let dx = 0, dy = 0;
+        let oldX = 0.0, oldY = 0.0, newX = 0.0, newY = 0.0;
 
-        this._touches.forEach((currentTouch, i) => {
+        this._touches.forEach((oldTouch, i) => {
             let newTouch = null;
 
             for (let j = 0; j < touches.length; j++) {
-                if (currentTouch.identifier === touches[j].identifier) {
+                if (oldTouch.identifier === touches[j].identifier) {
                     newTouch = touches[j];
                     break;
                 }
@@ -50,11 +50,14 @@ class OngoingTouches {
             if (newTouch === null) {
                 // TODO maybe one should clear missing touches.
             } else {
-                dx += newTouch.clientX - currentTouch.clientX;
-                dy += newTouch.clientY - currentTouch.clientY;
+                newX += newTouch.clientX;
+                newY += newTouch.clientY;
 
-                currentTouch.clientX = newTouch.clientX;
-                currentTouch.clientY = newTouch.clientY;
+                oldX += oldTouch.clientX;
+                oldY += oldTouch.clientY;
+
+                oldTouch.clientX = newTouch.clientX;
+                oldTouch.clientY = newTouch.clientY;
             }
         });
 
@@ -63,7 +66,15 @@ class OngoingTouches {
             + sqr(this._touches[1].clientY - this._touches[0].clientY)
         ) : 1.0;
 
-        return {dx, dy, k_zoom: Math.sqrt(newSquaredDistance/oldSquaredDistance)};
+        const kZoom = Math.sqrt(newSquaredDistance/oldSquaredDistance);
+
+        oldX /= this._touches.length;
+        oldY /= this._touches.length;
+
+        newX /= this._touches.length;
+        newY /= this._touches.length;
+
+        return {oldX, oldY, newX, newY, kZoom};
     }
 
     countTouch() {
