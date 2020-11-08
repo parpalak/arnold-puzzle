@@ -205,10 +205,10 @@ class Renderer {
     }
 
     /**
-     * @param {number} zoomDirection +1 or -1 to zoom in or out
+     * @param {number} multiplier
      */
-    changeZoom(zoomDirection) {
-        this._zoom *= Math.exp(zoomDirection * 0.2);
+    changeZoom(multiplier) {
+        this._zoom *= multiplier;
         if (this._zoom < 1) {
             this._zoom = 1;
         }

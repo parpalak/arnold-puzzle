@@ -50,7 +50,7 @@ const renderer = new Renderer(eCanvas, field, recalcScore);
 let n = Number(localStorage.getItem('current_n') || 9);
 changeLineNumTo(n);
 
-document.getElementById('plus').addEventListener('click', (e) => {
+document.getElementById('plus').addEventListener('click', e => {
     if (n < 33) {
         localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
         localStorage.setItem('current_n', String(field.lineNum));
@@ -58,7 +58,7 @@ document.getElementById('plus').addEventListener('click', (e) => {
         changeLineNumTo(n);
     }
 });
-document.getElementById('minus').addEventListener('click', (e) => {
+document.getElementById('minus').addEventListener('click', e => {
     if (n >= 5) {
         localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
         localStorage.setItem('current_n', String(field.lineNum));
@@ -67,22 +67,23 @@ document.getElementById('minus').addEventListener('click', (e) => {
     }
 });
 
-eCanvas.addEventListener('wheel', function (e) {
+eCanvas.addEventListener('wheel', e => {
     let delta = e.deltaY || e.detail;
 
     if (!e.ctrlKey) {
-        renderer.changeZoom(delta < 0 ? 1 : -1);
+        const zoomDirection = delta < 0 ? 1 : -1;
+        renderer.changeZoom(Math.exp(zoomDirection * 0.2));
         renderer.drawFrame();
     }
 });
 
-let mousePressed = false, x, y, clickX, clickY;
-eCanvas.addEventListener('mousedown', function (e) {
+let mousePressed = false, currentPointerX, currentPointerY, clickX, clickY;
+eCanvas.addEventListener('mousedown', e => {
     mousePressed = true;
-    clickX = x = e.offsetX;
-    clickY = y = e.offsetY;
+    clickX = currentPointerX = e.offsetX;
+    clickY = currentPointerY = e.offsetY;
 });
-eCanvas.addEventListener('mouseup', function (e) {
+eCanvas.addEventListener('mouseup', e => {
     mousePressed = false;
     if (e.button === 0 && Math.abs(e.offsetX - clickX) < 3 && Math.abs(e.offsetY - clickY) < 3) {
         setTimeout(() => {
@@ -98,14 +99,65 @@ eCanvas.addEventListener('mousemove', function (e) {
             mousePressed = false;
             return;
         }
-        renderer.shift(e.offsetX - x, e.offsetY - y);
+        renderer.shift(e.offsetX - currentPointerX, e.offsetY - currentPointerY);
         renderer.drawFrame();
-        x = e.offsetX;
-        y = e.offsetY;
+        currentPointerX = e.offsetX;
+        currentPointerY = e.offsetY;
     } else {
         this.style.cursor = renderer.canClick(e.offsetX, e.offsetY) ? 'pointer' : 'default';
     }
 });
+
+const ongoingTouches = new OngoingTouches();
+
+eCanvas.addEventListener("touchstart", e => {
+    e.preventDefault();
+    const touches = e.changedTouches;
+
+    if (ongoingTouches.countTouch() === 0) {
+        clickX = touches[0].clientX;
+        clickY = touches[0].clientY;
+    }
+
+    for (let i = 0; i < touches.length; i++) {
+        ongoingTouches.addTouch(touches[i]);
+    }
+});
+eCanvas.addEventListener("touchend", e => {
+    e.preventDefault();
+    const touches = e.changedTouches;
+
+    for (let i = 0; i < touches.length; i++) {
+        ongoingTouches.removeTouch(touches[i]);
+    }
+
+    if (ongoingTouches.countTouch() === 0 &&  Math.abs(touches[0].clientX - clickX) < 3 && Math.abs(touches[0].clientY - clickY) < 3) {
+        setTimeout(() => {
+            localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
+            localStorage.setItem('current_n', String(field.lineNum));
+        }, 1000);
+        renderer.doClick(touches[0].clientX, touches[0].clientY);
+    }
+
+}, false);
+eCanvas.addEventListener("touchcancel", e => {
+    e.preventDefault();
+    const touches = e.changedTouches;
+
+    for (let i = 0; i < touches.length; i++) {
+        ongoingTouches.removeTouch(touches[i]);
+    }
+}, false);
+eCanvas.addEventListener("touchmove", e => {
+    e.preventDefault();
+
+    const {dx, dy, k_zoom} = ongoingTouches.applyTouches(e.touches);
+
+    renderer.shift(dx, dy);
+    renderer.changeZoom(k_zoom);
+    renderer.drawFrame();
+}, false);
+
 
 window.addEventListener('resize', resizeHandler);
 document.addEventListener('readystatechange', resizeHandler);

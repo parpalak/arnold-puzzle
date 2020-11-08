@@ -12,6 +12,7 @@ module.exports = function(grunt) {
                     'src/polygon.js',
                     'src/field.js',
                     'src/renderer.js',
+                    'src/ongoing-touches.js',
                     'src/controller.js'
                 ],
                 dest: 'public/bundle.js',
