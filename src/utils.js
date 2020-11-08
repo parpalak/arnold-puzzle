@@ -1,3 +1,5 @@
+const infinity = 1000;
+
 /**
  * @returns {string}
  */
