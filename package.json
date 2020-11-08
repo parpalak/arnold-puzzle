@@ -1,0 +1,12 @@
+{
+    "name": "arnold-games",
+    "version": "0.1.0",
+    "devDependencies": {
+        "grunt": "^1.3.0",
+        "grunt-contrib-concat": "^1.0.1",
+        "grunt-contrib-cssmin": "^3.0.0",
+        "grunt-processhtml": "^0.4.2",
+        "grunt-shell": "^3.0.1",
+        "grunt-terser": "^1.0.0"
+    }
+}
