@@ -1,0 +1,20 @@
+{
+    "name": "Arnold's Puzzle",
+    "short_name": "Arnold's Puzzle",
+    "icons": [
+        {
+            "src": "/i/icon-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/i/icon-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#9df5f5",
+    "background_color": "#008B8B",
+    "display": "standalone",
+    "start_url": "/"
+}
