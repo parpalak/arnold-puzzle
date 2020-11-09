@@ -25,6 +25,9 @@ module.exports = function(grunt) {
             }
         },
         processhtml: {
+            options: {
+                data: {hash: + new Date()}
+            },
             index: {
                 src: 'src/index.html',
                 dest: 'public/index.html'

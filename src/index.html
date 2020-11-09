@@ -4,7 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <title>Arnold's Puzzle</title>
+    <!-- build:remove -->
     <link rel="stylesheet" href="style.css">
+    <!-- /build -->
+
+    <!-- build:template
+    <link rel="stylesheet" href="style.css?<%= hash %>">
+    /build -->
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -28,7 +34,7 @@
     </div>
     <div id="instruction">Click triangles to flip. Get the maximum number of dark regions.</div>
 </div>
-<!-- build:js bundle.min.js -->
+<!-- build:remove -->
 <script src="utils.js"></script>
 <script src="point.js"></script>
 <script src="line.js"></script>
@@ -38,5 +44,9 @@
 <script src="ongoing-touches.js"></script>
 <script src="controller.js"></script>
 <!-- /build -->
+
+<!-- build:template
+<script src="bundle.min.js?<%= hash %>"></script>
+/build -->
 </body>
 </html>
