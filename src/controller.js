@@ -110,7 +110,7 @@ eCanvas.addEventListener('mousemove', function (e) {
 
 const ongoingTouches = new OngoingTouches();
 
-eCanvas.addEventListener("touchstart", e => {
+eCanvas.addEventListener('touchstart', e => {
     e.preventDefault();
     const touches = e.changedTouches;
 
@@ -123,7 +123,7 @@ eCanvas.addEventListener("touchstart", e => {
         ongoingTouches.addTouch(touches[i]);
     }
 });
-eCanvas.addEventListener("touchend", e => {
+eCanvas.addEventListener('touchend', e => {
     e.preventDefault();
     const touches = e.changedTouches;
 
@@ -140,7 +140,7 @@ eCanvas.addEventListener("touchend", e => {
     }
 
 }, false);
-eCanvas.addEventListener("touchcancel", e => {
+eCanvas.addEventListener('touchcancel', e => {
     e.preventDefault();
     const touches = e.changedTouches;
 
@@ -148,7 +148,7 @@ eCanvas.addEventListener("touchcancel", e => {
         ongoingTouches.removeTouch(touches[i]);
     }
 }, false);
-eCanvas.addEventListener("touchmove", e => {
+eCanvas.addEventListener('touchmove', e => {
     e.preventDefault();
 
     const {oldX, oldY, newX, newY, kZoom} = ongoingTouches.applyTouches(e.touches);
@@ -169,3 +169,7 @@ document.getElementById('copyright-sign').addEventListener('click', (e) => {
 });
 
 renderer.toggleRun();
+
+document.getElementById('help').addEventListener('click', function () {
+    document.body.classList.toggle('shown-help');
+});

@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Arnold's Puzzle</title>
+    <title>Arnold&apos;s Puzzle</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 
     <link rel="apple-touch-icon" sizes="180x180" href="/i/apple-touch-icon.png">
@@ -24,8 +24,8 @@
 <body>
 <canvas id="canvas"></canvas>
 <div id="head">
-    <h1>Arnold's Puzzle
-        <button id="help">?</button>
+    <h1>Arnold&apos;s Puzzle
+        <button id="help" onclick="">?</button>
     </h1>
     <div class="lines-control">
         Lines:
@@ -34,6 +34,46 @@
         <button id="plus">+</button>
     </div>
     <div class="goal">Score: <span id="score" title="Dark regions number"></span>/<span id="goal" title="Upper estimate"></span></div>
+</div>
+<div id="about">
+    <h2>Rules</h2>
+
+    <ol>
+        <li>There are several lines on&nbsp;the&nbsp;plane and each pair of&nbsp;lines intersects at one point.</li>
+        <li>The lines divide the plane into regions. You can flip over a triangular region by clicking on it.</li>
+        <li>The goal is to get as many dark regions as possible.</li>
+    </ol>
+
+    <p>Your score is the number of dark regions. For the selected number of lines, a theoretical upper estimate is shown next to the score.</p>
+
+    <h2>Mathematical basis</h2>
+
+    <p>
+        This puzzle is named after Russian mathematician <a href="https://en.wikipedia.org/wiki/Vladimir_Arnold">Vladimir Arnold</a>.
+        It is inspired by one of the open mathematical problems published in his book
+        “<cite title="Problem #1983-4. Vladimir I. Arnold, ed. (15 November 2004). Arnold's Problems (2nd ed.). Springer-Verlag.">Arnold&apos;s problems</cite>”:
+    </p>
+    <blockquote>
+        Let N lines be given in the real plane, and their complement be chess-like painted black and white. What is the
+        greatest difference between the number of black and white regions?
+    </blockquote>
+    <p>
+        This problem is equivalent to the goal of the puzzle: maximizing the difference between the number of black and
+        white regions is almost the same as maximizing the number of black regions.
+    </p>
+    <p>
+        There are another closely related open mathematical problem&ndash;<a href="https://en.wikipedia.org/wiki/Kobon_triangle_problem">Kobon triangles problem</a>.
+    </p>
+
+    <h2>About author</h2>
+    <p>
+        I am a graduate of MIPT. My colleagues and I spent a lot of time trying to solve Arnold&apos;s problem.
+        The result of our research is in the <a href="https://written.ru/download/arnold.pdf">report (pdf, in Russian)</a>.
+    </p>
+
+    <p>
+        The source code of this puzzle is published on <a href="https://github.com/parpalak/arnold-puzzle">Github</a>.
+    </p>
 </div>
 <div id="bottom">
     <div id="info">
