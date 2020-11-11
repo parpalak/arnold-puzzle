@@ -371,11 +371,11 @@ class Field {
      */
     getPossibleNearestPoint(point, x, y) {
         let currentLine = point.lines[0];
-        let currentPt = currentLine.getClosestPoint(x, y);
+        let currentPt = currentLine.getClosestInnerPoint(x, y);
 
         while (true) {
             let newLine = (currentLine === currentPt.lines[0]) ? currentPt.lines[1] : currentPt.lines[0];
-            let newPt = newLine.getClosestPoint(x, y);
+            let newPt = newLine.getClosestInnerPoint(x, y);
             if (newPt === currentPt) {
                 break;
             }

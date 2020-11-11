@@ -44,12 +44,12 @@ class Line {
      * @param {number} x
      * @param {number} y
      */
-    getClosestPoint(x, y) {
+    getClosestInnerPoint(x, y) {
         let nearestDistance2 = sqr(infinity);
 
         /** @type {Point} */
         let nearestPoint = null;
-        for (let i = this._points.length; i--;) {
+        for (let i = 1; i < this._points.length - 1; i++) {
             const pt = this._points[i];
             const distance2 = pt.squaredDistanceFrom(x, y);
             if (distance2 < nearestDistance2) {
