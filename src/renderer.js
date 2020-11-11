@@ -49,7 +49,7 @@ class Renderer {
             this._flippingPolygon.i++;
             if (this._flippingPolygon.i === frameNum / 2) {
                 this._flippingPolygon.polygon.flip();
-                this._scoreCallback(this._field.darkPolygonNum());
+                this._scoreCallback(this._field.darkPolygonNum(), this._field.shouldCongratulate());
             }
             if (this._flippingPolygon.i >= frameNum) {
                 this._flippingPolygon.polygon.resetResize(finalProgress);

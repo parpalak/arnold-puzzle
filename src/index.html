@@ -25,15 +25,22 @@
 <canvas id="canvas"></canvas>
 <div id="head">
     <h1>Arnold&apos;s Puzzle
-        <button id="help" onclick="">?</button>
+        <button class="small" id="help">?</button>
     </h1>
     <div class="lines-control">
         Lines:
-        <button id="minus">−</button>
+        <button class="small" id="minus">−</button>
         <span id="line-num"></span>
-        <button id="plus">+</button>
+        <button class="small" id="plus">+</button>
     </div>
     <div class="goal">Score: <span id="score" title="Dark regions number"></span>/<span id="goal" title="Upper estimate"></span></div>
+</div>
+<div id="win">
+    <div class="win-info">
+        You win!<br>
+        <button id="win-next-level">Go to <span id="win-next-lines-num"></span> lines</button>
+        <button id="win-ok">Keep playing</button>
+    </div>
 </div>
 <div id="about">
     <h2>Rules</h2>

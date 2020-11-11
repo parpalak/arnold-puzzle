@@ -29,6 +29,7 @@ class Field {
     new_time_step = 1.0;
     float_time = true;
     _iterations = 0;
+    _hasWon = false;
 
     /**
      * @type {Polygon[]}
@@ -59,7 +60,7 @@ class Field {
      * Upper estimate for the black regions
      * @returns {number}
      */
-    darkPolygonNumLimit() {
+    get darkPolygonNumLimit() {
         const n = this.lineNum;
         const k = n * (n - 1) / 2 - this.generatorNum;
 
@@ -73,10 +74,24 @@ class Field {
         return this._polygons.filter(polygon => polygon.parity).length;
     }
 
+    shouldCongratulate() {
+        if (this._hasWon) {
+            return false;
+        }
+
+        if (this.darkPolygonNum() === this.darkPolygonNumLimit) {
+            this._hasWon = true;
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * @param {number[]} generators
      */
     parseGenerators(generators) {
+        this._hasWon = false;
         this._cachedPointCloseToCursor = null;
         this._cachedPolygonAtCursor = null;
 

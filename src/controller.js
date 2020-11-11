@@ -1,55 +1,39 @@
-function recalcScore(score) {
-    document.getElementById('score').innerHTML = score || field.darkPolygonNum();
-}
-
-function changeLineNumTo(n) {
-    const storedState = localStorage.getItem('stored_' + n);
-    if (storedState) {
-        field.setState(JSON.parse(storedState));
-    } else {
-        const generators = [];
-        for (let i = 0; i < n; i++) {
-            for (let j = i; j--;) {
-                generators.push(j);
-            }
-        }
-        field.parseGenerators(generators);
-    }
-
-    document.getElementById('line-num').innerHTML = String(n);
-    document.getElementById('goal').innerHTML = String(field.darkPolygonNumLimit());
-    renderer.drawFrame();
-    recalcScore();
-}
-
-function displayDebugInfo() {
-    const eInfo = document.getElementById('info');
-    if (eInfo) {
-        eInfo.innerHTML = [
-            'E: ' + (field.w_pot + field.w_kin * 0.5).toFixed(6)
-            , 'W: ' + field.w_pot.toFixed(6)
-            , 'K: ' + (field.w_kin * 0.5).toFixed(6)
-            , 'fps: ' + renderer.fps
-//            , 'itns: ' + field.iterations
-        ].map(val => '<span class="parameter">' + val + '</span>').join(' ');
-
-        setTimeout(displayDebugInfo, 1000);
-    }
-}
-
-function resizeHandler() {
-    const x = eCanvas.width = eCanvas.offsetWidth;
-    const y = eCanvas.height = eCanvas.offsetHeight;
-    renderer.drawFrame();
-
-    ongoingTouches.setLimits(x, y);
-}
-
+//
+// Initialize model and view
+//
 const eCanvas = document.getElementById('canvas');
 const field = new Field();
 const renderer = new Renderer(eCanvas, field, recalcScore);
 
-let n = Number(localStorage.getItem('current_n') || 9);
+
+//
+// Score, win screen
+//
+function recalcScore(score, showWinMessage) {
+    document.getElementById('score').innerHTML = score || field.darkPolygonNum();
+    if (showWinMessage) {
+        document.getElementById('win-next-lines-num').innerHTML = String(n + 2);
+        document.getElementById('win').style.display = 'block';
+        setTimeout(() => document.getElementById('win').classList.add('enabled'), 0);
+    }
+}
+
+function closeWinScreen() {
+    document.getElementById('win').classList.remove('enabled');
+    setTimeout(() => document.getElementById('win').style.display = 'none', 200);
+}
+
+document.getElementById('win-next-level').addEventListener('click', () => {
+    n = Number(document.getElementById('win-next-lines-num').innerHTML);
+    changeLineNumTo(n);
+    closeWinScreen();
+});
+document.getElementById('win-ok').addEventListener('click', closeWinScreen);
+
+//
+// Line number control
+//
+let n = Number(localStorage.getItem('current_n') || 5);
 changeLineNumTo(n);
 
 document.getElementById('plus').addEventListener('click', e => {
@@ -69,6 +53,29 @@ document.getElementById('minus').addEventListener('click', e => {
     }
 });
 
+function changeLineNumTo(n) {
+    const storedState = localStorage.getItem('stored_' + n);
+    if (storedState) {
+        field.setState(JSON.parse(storedState));
+    } else {
+        const generators = [];
+        for (let i = 0; i < n; i++) {
+            for (let j = i; j--;) {
+                generators.push(j);
+            }
+        }
+        field.parseGenerators(generators);
+    }
+
+    document.getElementById('line-num').innerHTML = String(n);
+    document.getElementById('goal').innerHTML = String(field.darkPolygonNumLimit);
+    renderer.drawFrame();
+    recalcScore();
+}
+
+//
+// Mouse events
+//
 eCanvas.addEventListener('wheel', e => {
     let delta = e.deltaY || e.detail;
 
@@ -109,6 +116,10 @@ eCanvas.addEventListener('mousemove', function (e) {
         this.style.cursor = renderer.canClick(e.offsetX, e.offsetY) ? 'pointer' : 'default';
     }
 });
+
+//
+// Touch events
+//
 
 const ongoingTouches = new OngoingTouches();
 
@@ -167,10 +178,23 @@ eCanvas.addEventListener('touchmove', e => {
     renderer.drawFrame();
 }, false);
 
+//
+// Window resizing
+//
+function resizeHandler() {
+    const x = eCanvas.width = eCanvas.offsetWidth;
+    const y = eCanvas.height = eCanvas.offsetHeight;
+    renderer.drawFrame();
+
+    ongoingTouches.setLimits(x, y);
+}
 
 window.addEventListener('resize', resizeHandler);
 document.addEventListener('readystatechange', resizeHandler);
 
+//
+// Easter egg
+//
 document.getElementById('copyright-sign').addEventListener('click', (e) => {
     if (e.ctrlKey) {
         displayDebugInfo();
@@ -178,8 +202,29 @@ document.getElementById('copyright-sign').addEventListener('click', (e) => {
     }
 });
 
-renderer.toggleRun();
+function displayDebugInfo() {
+    const eInfo = document.getElementById('info');
+    if (eInfo) {
+        eInfo.innerHTML = [
+            'E: ' + (field.w_pot + field.w_kin * 0.5).toFixed(6)
+            , 'W: ' + field.w_pot.toFixed(6)
+            , 'K: ' + (field.w_kin * 0.5).toFixed(6)
+            , 'fps: ' + renderer.fps
+//            , 'itns: ' + field.iterations
+        ].map(val => '<span class="parameter">' + val + '</span>').join(' ');
 
+        setTimeout(displayDebugInfo, 1000);
+    }
+}
+
+//
+// Help control
+//
 document.getElementById('help').addEventListener('click', function () {
     document.body.classList.toggle('shown-help');
 });
+
+//
+// Start
+//
+renderer.toggleRun();
