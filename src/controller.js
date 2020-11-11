@@ -127,8 +127,12 @@ eCanvas.addEventListener('touchend', e => {
     e.preventDefault();
     const touches = e.changedTouches;
 
-    for (let i = 0; i < touches.length; i++) {
-        ongoingTouches.removeTouch(touches[i]);
+    if (e.touches.length === 0) {
+        ongoingTouches.clearTouches();
+    } else {
+        for (let i = 0; i < touches.length; i++) {
+            ongoingTouches.removeTouch(touches[i]);
+        }
     }
 
     if (ongoingTouches.countTouch() === 0 &&  Math.abs(touches[0].clientX - clickX) < 3 && Math.abs(touches[0].clientY - clickY) < 3) {
@@ -144,8 +148,12 @@ eCanvas.addEventListener('touchcancel', e => {
     e.preventDefault();
     const touches = e.changedTouches;
 
-    for (let i = 0; i < touches.length; i++) {
-        ongoingTouches.removeTouch(touches[i]);
+    if (e.touches.length === 0) {
+        ongoingTouches.clearTouches();
+    } else {
+        for (let i = 0; i < touches.length; i++) {
+            ongoingTouches.removeTouch(touches[i]);
+        }
     }
 }, false);
 eCanvas.addEventListener('touchmove', e => {

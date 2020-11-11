@@ -15,6 +15,10 @@ class OngoingTouches {
         }
     }
 
+    clearTouches() {
+        this._touches = [];
+    }
+
     copyTouch({identifier, clientX, clientY}) {
         return {identifier, clientX, clientY};
     }
