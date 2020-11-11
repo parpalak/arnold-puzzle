@@ -1,6 +1,13 @@
 class OngoingTouches {
 
     _touches = [];
+    _width = 0;
+    _height = 0;
+
+    setLimits(width, height) {
+        this._width = width;
+        this._height = height;
+    }
 
     addTouch(touch) {
         if (this._touches.length < 2) {
@@ -54,14 +61,19 @@ class OngoingTouches {
             if (newTouch === null) {
                 // TODO maybe one should clear missing touches.
             } else {
-                newX += newTouch.clientX;
-                newY += newTouch.clientY;
+                // Some browsers (e.g. Chrome on Linux) returns insane coords like 21735
+                // when move fingers upward out of the browser. That's why we check boundary conditions.
+                const x = newTouch.clientX >= 0 && newTouch.clientX <= this._width ? newTouch.clientX : oldTouch.clientX;
+                const y = newTouch.clientY >= 0 && newTouch.clientY <= this._height ? newTouch.clientY : oldTouch.clientY;
+
+                newX += x;
+                newY += y;
 
                 oldX += oldTouch.clientX;
                 oldY += oldTouch.clientY;
 
-                oldTouch.clientX = newTouch.clientX;
-                oldTouch.clientY = newTouch.clientY;
+                oldTouch.clientX = x
+                oldTouch.clientY = y;
 
                 count++;
             }

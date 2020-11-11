@@ -38,9 +38,11 @@ function displayDebugInfo() {
 }
 
 function resizeHandler() {
-    eCanvas.width = eCanvas.offsetWidth;
-    eCanvas.height = eCanvas.offsetHeight;
+    const x = eCanvas.width = eCanvas.offsetWidth;
+    const y = eCanvas.height = eCanvas.offsetHeight;
     renderer.drawFrame();
+
+    ongoingTouches.setLimits(x, y);
 }
 
 const eCanvas = document.getElementById('canvas');
