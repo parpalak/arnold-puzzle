@@ -39,7 +39,7 @@ class OngoingTouches {
             + sqr(this._touches[1].clientY - this._touches[0].clientY)
         ) : 1.0;
 
-        let oldX = 0.0, oldY = 0.0, newX = 0.0, newY = 0.0;
+        let oldX = 0.0, oldY = 0.0, newX = 0.0, newY = 0.0, count = 0;
 
         this._touches.forEach((oldTouch, i) => {
             let newTouch = null;
@@ -62,6 +62,8 @@ class OngoingTouches {
 
                 oldTouch.clientX = newTouch.clientX;
                 oldTouch.clientY = newTouch.clientY;
+
+                count++;
             }
         });
 
@@ -72,11 +74,15 @@ class OngoingTouches {
 
         const kZoom = Math.sqrt(newSquaredDistance/oldSquaredDistance);
 
-        oldX /= this._touches.length;
-        oldY /= this._touches.length;
+        if (count === 0) {
+            count = 1; // If there are no touches, return equal points.
+        }
 
-        newX /= this._touches.length;
-        newY /= this._touches.length;
+        oldX /= count;
+        oldY /= count;
+
+        newX /= count;
+        newY /= count;
 
         return {oldX, oldY, newX, newY, kZoom};
     }
