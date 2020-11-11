@@ -45,7 +45,7 @@ class Line {
      * @param {number} y
      */
     getClosestInnerPoint(x, y) {
-        let nearestDistance2 = sqr(infinity);
+        let nearestDistance2 = sqr(infinity*1e10);
 
         /** @type {Point} */
         let nearestPoint = null;
