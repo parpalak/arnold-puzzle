@@ -220,6 +220,12 @@ class Field {
     }
 
     getState() {
+        return {
+            points: this.getPointsState()
+        }
+    }
+
+    getPointsState() {
         const rearrangement = [];
         const pointIndexOfLine = [];
         for (let i = this.lineNum; i--;) {
@@ -262,8 +268,8 @@ class Field {
     }
 
     setState(state) {
-        this.parseGenerators(state.map(item => item.g));
-        state.forEach((pt, i) => {
+        this.parseGenerators(state.points.map(item => item.g));
+        state.points.forEach((pt, i) => {
             this._points[i].setState(pt.x, pt.y);
         });
     }

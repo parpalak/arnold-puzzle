@@ -270,11 +270,26 @@ class Renderer {
     }
 
     /**
-     *
      * @param {number} canvasY
      * @returns {number}
      */
     getSystemYFromCanvas(canvasY) {
         return -(canvasY - this.eCanvas.height * 0.5 - this._canvasY) / this._zoom;
+    }
+
+    getState() {
+        return {
+            field: this._field.getState(),
+            canvasX: this._canvasX,
+            canvasY: this._canvasY,
+            zoom: this._zoom,
+        }
+    }
+
+    setState(state) {
+        this._canvasX = state.canvasX || this._canvasX;
+        this._canvasY = state.canvasY || this._canvasY;
+        this._zoom = state.zoom || this._zoom;
+        this._field.setState(state.field);
     }
 }

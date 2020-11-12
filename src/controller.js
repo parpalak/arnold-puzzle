@@ -31,23 +31,26 @@ document.getElementById('win-next-level').addEventListener('click', () => {
 document.getElementById('win-ok').addEventListener('click', closeWinScreen);
 
 //
-// Line number control
+// Line number control, localstorage
 //
 let n = Number(localStorage.getItem('current_n') || 5);
 changeLineNumTo(n);
 
+function storeState() {
+    localStorage.setItem('stored_' + field.lineNum, JSON.stringify(renderer.getState()));
+    localStorage.setItem('current_n', String(field.lineNum));
+}
+
 document.getElementById('plus').addEventListener('click', e => {
     if (n < 33) {
-        localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
-        localStorage.setItem('current_n', String(field.lineNum));
+        storeState();
         n += 2;
         changeLineNumTo(n);
     }
 });
 document.getElementById('minus').addEventListener('click', e => {
     if (n >= 5) {
-        localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
-        localStorage.setItem('current_n', String(field.lineNum));
+        storeState();
         n -= 2;
         changeLineNumTo(n);
     }
@@ -56,7 +59,16 @@ document.getElementById('minus').addEventListener('click', e => {
 function changeLineNumTo(n) {
     const storedState = localStorage.getItem('stored_' + n);
     if (storedState) {
-        field.setState(JSON.parse(storedState));
+        let parsedState = JSON.parse(storedState);
+        if (Array.isArray(parsedState)) {
+            // TODO remove soon
+            parsedState = {
+                field: {
+                    points: parsedState,
+                }
+            }
+        }
+        renderer.setState(parsedState);
     } else {
         const generators = [];
         for (let i = 0; i < n; i++) {
@@ -95,10 +107,7 @@ eCanvas.addEventListener('mousedown', e => {
 eCanvas.addEventListener('mouseup', e => {
     mousePressed = false;
     if (e.button === 0 && Math.abs(e.offsetX - clickX) < 3 && Math.abs(e.offsetY - clickY) < 3) {
-        setTimeout(() => {
-            localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
-            localStorage.setItem('current_n', String(field.lineNum));
-        }, 1000);
+        setTimeout(storeState, 1000);
         renderer.doClick(e.offsetX, e.offsetY);
     }
 });
@@ -148,11 +157,8 @@ eCanvas.addEventListener('touchend', e => {
         }
     }
 
-    if (ongoingTouches.countTouch() === 0 &&  Math.abs(touches[0].clientX - clickX) < 3 && Math.abs(touches[0].clientY - clickY) < 3) {
-        setTimeout(() => {
-            localStorage.setItem('stored_' + field.lineNum, JSON.stringify(field.getState()));
-            localStorage.setItem('current_n', String(field.lineNum));
-        }, 1000);
+    if (ongoingTouches.countTouch() === 0 && Math.abs(touches[0].clientX - clickX) < 3 && Math.abs(touches[0].clientY - clickY) < 3) {
+        setTimeout(storeState, 1000);
         renderer.doClick(touches[0].clientX, touches[0].clientY);
     }
 
