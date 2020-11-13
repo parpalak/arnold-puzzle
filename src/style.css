@@ -20,6 +20,11 @@ body {
     color: #9df5f5;
 }
 
+:focus {
+    box-shadow: 0 0 3px 1px #9df5f5;
+    outline: none;
+}
+
 .digit {
     text-align: center;
     width: 0.55em;
@@ -44,20 +49,21 @@ button {
     pointer-events: auto;
     }
 button.small {
+    border: none;
     font-size: 16px;
     vertical-align: 4px;
     line-height: 1;
-    margin: 0 0.25em;
+    margin: 0 2px;
     padding: 0;
-    width: 19px;
-    height: 23px;
+    width: 22px;
+    height: 22px;
+    background: url('data:image/svg+xml;utf8,<svg width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M1 4 v14 l3 3 h14 l3 -3 v-14 l-3 -3 h-14 l-3 3 Z" fill="transparent" stroke="rgb(157, 245, 245)" stroke-width="2"></path></svg>');
     }
     button:hover {
         cursor: pointer;
         }
     button:focus {
-        background-color: rgba(157, 245, 245, 0.2);
-        outline: none;
+        border-radius: 6px;
         }
     button:before,
     button:after {
@@ -75,6 +81,23 @@ button.small {
     button:after {
         border-left-color: #9df5f5;
         right: -4px;
+        }
+    button.small:before {
+        content: none;
+        border: none;
+        }
+    button.small:after {
+        border: none;
+        width: 22px;
+        height: 22px;
+        top: 0;
+        left: 0;
+        }
+    button#plus.small:after {
+        background: url('data:image/svg+xml;utf8,<svg width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M6 11 h10 M11 6 v10" stroke="rgb(157, 245, 245)" stroke-width="2"></path></svg>');
+        }
+    button#minus.small:after {
+        background: url('data:image/svg+xml;utf8,<svg width="22" height="22" xmlns="http://www.w3.org/2000/svg"><path d="M6 11 h10" stroke="rgb(157, 245, 245)" stroke-width="2"></path></svg>');
         }
 
 #head,
