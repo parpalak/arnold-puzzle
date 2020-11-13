@@ -1,3 +1,9 @@
+/**
+ * Arnold's Puzzle
+ *
+ * @copyright Roman Parpalak 2020
+ */
+
 const k_spring = 0.0;
 const q2 = 0.1;
 const k_elastic = 10.0;
@@ -98,11 +104,11 @@ class Field {
         let i;
         this.generatorNum = generators.length;
 
-        // Может генераторы идут не с нуля? Ща исправим
+        // Fix generators if start from non-zero
         const minGenerator = Math.min(...generators);
         const maxGenerator = Math.max(...generators);
 
-        // Считаем разность
+        // Calc difference between black and white regions
         this.s = 0;
         for (i = 0; i < this.generatorNum; i++) {
             generators[i] -= minGenerator;
@@ -111,13 +117,13 @@ class Field {
 
         this.lineNum = maxGenerator - minGenerator + 2;
 
-        // готовим матрицу прямых
+        // Initialize line array
         this._lines = [];
         for (i = 0; i < this.lineNum; i++) {
             this._lines[i] = new Line(getRandomColor());
         }
 
-        // Готовим перестановку
+        // Prepare rearrangements
         let rearrangement = [], inverseRearrangement = [];
         for (i = 0; i < this.lineNum; i++) {
             rearrangement[i] = i;
@@ -131,13 +137,13 @@ class Field {
             topPolygons[i] = polygons[i] = (new Polygon(this.getGeneratorParity(i))).markAsExternal();
         }
 
-        // Парсим генераторы
+        // Parsing generators
         this._points = [];
         this._polygons = [];
         for (i = 0; i < this.generatorNum; i++) {
             const generator = generators[i];
 
-            // Меняем местами соседние элементы в перестановке
+            // Exchanging adjacent lines
             let a_i = rearrangement[generator];
             rearrangement[generator] = rearrangement[generator + 1];
             rearrangement[generator + 1] = a_i;
@@ -164,15 +170,15 @@ class Field {
             polygons[generator + 1].addLeftPoint(point);
         }
 
-        // Смотрим, как расположены точки внизу карты метро, нужно для правильной
-        // расстановки фиктивных точек.
+        // Calculate inverse rearrangement to see how the points are placed at the bottom of wire diagram.
+        // It's required to place fake points properly.
         let str = '';
         for (i = 0; i < this.lineNum; i++) {
             str += ' ' + rearrangement[i];
             inverseRearrangement[rearrangement[i]] = i;
         }
 
-        // Добавляем фиктивные точки
+        // Adding fake points
         for (i = this.lineNum; i--;) {
             // It's important to count i down since it's hard to make top polygons oriented.
 
@@ -231,7 +237,7 @@ class Field {
         for (let i = this.lineNum; i--;) {
             rearrangement[i] = i;
 
-            // 1 because of skipping external points
+            // Starts from 1 because of skipping fake points
             pointIndexOfLine[i] = 1;
         }
 

@@ -1,3 +1,9 @@
+/**
+ * Arnold's Puzzle
+ *
+ * @copyright Roman Parpalak 2020
+ */
+
 const beta = [
     [1 / 3, 0, 0, 0, 0],
     [1 / 6, 1 / 6, 0, 0, 0],

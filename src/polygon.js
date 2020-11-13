@@ -1,3 +1,9 @@
+/**
+ * Arnold's Puzzle
+ *
+ * @copyright Roman Parpalak 2020
+ */
+
 class Polygon {
     /**
      * @type {boolean}
