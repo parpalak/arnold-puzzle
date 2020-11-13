@@ -20,6 +20,12 @@ body {
     color: #9df5f5;
 }
 
+.digit {
+    text-align: center;
+    width: 0.55em;
+    display: inline-block;
+}
+
 ::-moz-selection {
     background: #00b8e7;
     color: #d0ffff
@@ -99,11 +105,6 @@ button.small {
         }
         .lines-control button {
             vertical-align: 5px;
-            }
-        #score {
-            min-width: 39px;
-            display: inline-block;
-            text-align: center;
             }
 
 h2 {
@@ -241,6 +242,19 @@ body {
 }
 ::-webkit-scrollbar-corner {
     background: rgba(157, 245, 245, 0.1);
+}
+
+@media all and (min-width: 720px) {
+    #line-num {
+        min-width: 1.1em;
+        display: inline-block;
+        text-align: center;
+    }
+    .score-goal {
+        min-width: 3.85em;
+        display: inline-block;
+        text-align: right;
+    }
 }
 
 @media all and (max-width: 499px) {

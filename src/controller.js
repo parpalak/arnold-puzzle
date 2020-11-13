@@ -5,12 +5,11 @@ const eCanvas = document.getElementById('canvas');
 const field = new Field();
 const renderer = new Renderer(eCanvas, field, recalcScore);
 
-
 //
 // Score, win screen
 //
 function recalcScore(score, showWinMessage) {
-    document.getElementById('score').innerHTML = score || field.darkPolygonNum();
+    document.getElementById('score').innerHTML = wrapNum(score || field.darkPolygonNum());
     if (showWinMessage) {
         document.getElementById('win-next-lines-num').innerHTML = String(n + 2);
         document.getElementById('win').style.display = 'block';
@@ -79,8 +78,8 @@ function changeLineNumTo(n) {
         field.parseGenerators(generators);
     }
 
-    document.getElementById('line-num').innerHTML = String(n);
-    document.getElementById('goal').innerHTML = String(field.darkPolygonNumLimit);
+    document.getElementById('line-num').innerHTML = wrapNum(n);
+    document.getElementById('goal').innerHTML = wrapNum(field.darkPolygonNumLimit);
     renderer.drawFrame();
     recalcScore();
 }

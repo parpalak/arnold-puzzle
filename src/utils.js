@@ -102,3 +102,12 @@ function add_electric_force(a, b, q2) {
 
     return q2 / r;
 }
+
+/**
+ * Wraps each digit of numbers to fix non-monospace font.
+ * @param {number} n
+ * @returns {string}
+ */
+function wrapNum(n) {
+    return String(n).split('').map(digit => '<span class="digit">' + digit + '</span>').join('');
+}
