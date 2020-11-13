@@ -88,6 +88,8 @@ function changeLineNumTo(n) {
     document.getElementById('goal').innerHTML = wrapNum(field.darkPolygonNumLimit);
     renderer.drawFrame();
     recalcScore();
+
+    localStorage.setItem('current_n', String(field.lineNum));
 }
 
 //
