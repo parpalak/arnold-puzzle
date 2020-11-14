@@ -54,21 +54,27 @@ class Renderer {
 
             this._flippingPolygon.i++;
             if (this._flippingPolygon.i === frameNum / 2) {
+                // Triangle is collapsed
                 this._flippingPolygon.polygon.flip();
                 this._scoreCallback(this._field.darkPolygonNum(), this._field.shouldCongratulate());
+                // Loop Iteration
+                this._flippingPolygon.polygon.resize(finalProgress * this._flippingPolygon.i / frameNum, this._flippingPolygon.center);
             }
             if (this._flippingPolygon.i >= frameNum) {
+                // End of loop
                 this._flippingPolygon.polygon.resetResize(finalProgress);
                 this._flippingPolygon = null;
 
                 // Prevent freeze
                 this._skippedFrame = 120;
+                this._field.moderateFloatStep()
             } else {
+                // Loop Iteration
                 this._flippingPolygon.polygon.resize(finalProgress * this._flippingPolygon.i / frameNum, this._flippingPolygon.center);
             }
             this.drawFrame();
 
-        } else if (this._field.w_kin * 0.5 > 0.001 || this._skippedFrame++ > 60) {
+        } else if (this._field.w_kin > 0.001 || this._skippedFrame++ > 60) {
             // Physics animation.
             // Slow down speed when kinetic energy is low and the configuration is almost stopped.
             this._skippedFrame = 0;
@@ -123,15 +129,15 @@ class Renderer {
         /**
          * Draw force vectors
          */
-            // ctx.strokeStyle = '#f55';
-            // const allPoints = this._field.points;
-            // for (let i = 0; i < allPoints.length; i++) {
-            //     const pt = allPoints[i];
-            //     ctx.beginPath();
-            //     ctx.moveTo(pt.rx, pt.ry);
-            //     ctx.lineTo(pt.rx + pt.fx, pt.ry + pt.fy);
-            //     ctx.stroke();
-            // }
+        // ctx.strokeStyle = '#f55';
+        // const allPoints = this._field.points;
+        // for (let i = 0; i < allPoints.length; i++) {
+        //     const pt = allPoints[i];
+        //     ctx.beginPath();
+        //     ctx.moveTo(pt.rx, pt.ry);
+        //     ctx.lineTo(pt.rx + pt.fx, pt.ry + pt.fy);
+        //     ctx.stroke();
+        // }
 
         const polygons = this._field.polygons;
         for (let i = polygons.length; i--;) {

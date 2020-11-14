@@ -29,10 +29,10 @@ class Field {
      * Step or upper limit to floating step.
      * @type {number}
      */
-    dt = 0.1;
+    dt = 1.0;
 
-    time_step = 1.0;
-    new_time_step = 1.0;
+    current_dt = 0.1;
+    new_possible_dt = 0.1;
     float_time = true;
     _iterations = 0;
     _hasWon = false;
@@ -285,16 +285,13 @@ class Field {
     }
 
     calculateStep() {
-        let dt1;
-        // if (this.float_time) {
-        //     this.time_step = Math.min(1.001*this.time_step, this.dt);
-        //     dt1 = Math.min(this.dt, this.time_step);
-        // }
-        // else {
-        dt1 = this.dt;
-        // }
-
-        // this.calcForces();
+        let h;
+        if (this.float_time) {
+             h = this.current_dt = Math.min(1.1*this.current_dt, this.new_possible_dt, this.dt);
+        }
+        else {
+            h = this.current_dt = this.dt;
+        }
 
         for (let step = 0; step < 5; step++) {
             for (let i = this.generatorNum; i--;) {
@@ -302,21 +299,29 @@ class Field {
             }
             this.calcForces();
             for (let i = this.generatorNum; i--;) {
-                this._points[i].storeDerivativeForStep(step, dt1);
+                this._points[i].storeDerivativeForStep(step, h);
             }
         }
 
-        // Max value
-        this.new_time_step = this.dt;
-
         this.w_kin = 0;
+        let squaredError = 0;
         for (let i = this.generatorNum; i--;) {
             this.w_kin += this._points[i].realMove();
+            squaredError = Math.max(squaredError, this._points[i].integrationErrorSquared());
         }
 
-        // TODO float step!!!
+        // Error estimate for current integration is of order O(h^4).
+        // This is a floating step to keep error on each step of order 1e-5.
+        this.new_possible_dt = Math.pow(1e-11/squaredError, 1.0/8.0);
 
         this._iterations++;
+    }
+
+    /**
+     * Slows down the calculation when a point is moved externally.
+     */
+    moderateFloatStep() {
+        this.new_possible_dt = Math.min(0.1, this.new_possible_dt);
     }
 
     calcForces() {

@@ -4,6 +4,7 @@
  * @copyright Roman Parpalak 2020
  */
 
+// Coefficients for Kutta-Merson method
 const beta = [
     [1 / 3, 0, 0, 0, 0],
     [1 / 6, 1 / 6, 0, 0, 0],
@@ -11,6 +12,7 @@ const beta = [
     [1 / 2, 0, -3 / 2, 2, 0]
 ];
 const beta_last = [1 / 6, 0, 0, 2 / 3, 1 / 6];
+const beta_error = [1 / 15, 0, -0.3, 4 / 15, -1 / 30];
 
 const m = 1;
 
@@ -32,10 +34,10 @@ class Point {
     fy = 0.0;
 
     // derivatives for Runge-Kutta method
-    k_rx = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-    k_ry = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-    k_vx = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
-    k_vy = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0];
+    k_rx = [0.0, 0.0, 0.0, 0.0, 0.0];
+    k_ry = [0.0, 0.0, 0.0, 0.0, 0.0];
+    k_vx = [0.0, 0.0, 0.0, 0.0, 0.0];
+    k_vy = [0.0, 0.0, 0.0, 0.0, 0.0];
 
     /**
      * @type {Line[]}
@@ -104,6 +106,23 @@ class Point {
 
         this.k_vx[stepIndex] = this.fx * dt / m;
         this.k_vy[stepIndex] = this.fy * dt / m;
+    }
+
+    /**
+     * @returns {number}
+     */
+    integrationErrorSquared() {
+        let e_rx = 0.0;
+        let e_ry = 0.0;
+        let e_vx = 0.0;
+        let e_vy = 0.0;
+        for (let step = 0; step < 5; step++) {
+            e_rx += this.k_rx[step] * beta_error[step];
+            e_ry += this.k_ry[step] * beta_error[step];
+            e_vx += this.k_vx[step] * beta_error[step];
+            e_vy += this.k_vy[step] * beta_error[step];
+        }
+        return sqr(e_rx) + sqr(e_ry) + sqr(e_vx) + sqr(e_vy) ;
     }
 
     /**

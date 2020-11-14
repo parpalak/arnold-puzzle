@@ -223,6 +223,7 @@ function displayDebugInfo() {
             , 'W: ' + field.w_pot.toFixed(6)
             , 'K: ' + (field.w_kin * 0.5).toFixed(6)
             , 'fps: ' + renderer.fps
+            , 'dt: ' + field.current_dt.toFixed(6)
 //            , 'itns: ' + field.iterations
         ].map(val => '<span class="parameter">' + val + '</span>').join(' ');
 
