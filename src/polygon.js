@@ -194,14 +194,14 @@ class Polygon {
         }
 
         /**
-         * @type {Set<Line>}
+         * @type {CustomSet<Line>}
          */
-        const nearLines = new Set;
+        const nearLines = new CustomSet();
 
         /**
-         * @type {Set<Polygon>}
+         * @type {CustomSet<Polygon>}
          */
-        const nearPolygons = new Set;
+        const nearPolygons = new CustomSet();
 
         this._points.forEach(point => {
             const pointLines = point.lines;

@@ -68,7 +68,7 @@ class Line {
     }
 
     flip(...points) {
-        const ptSet = new Set(points);
+        const ptSet = new CustomSet(points);
         let idx1;
 
         for (let i = this._points.length; i--;) {

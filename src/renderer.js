@@ -53,7 +53,7 @@ class Renderer {
             const frameNum = 8;
 
             this._flippingPolygon.i++;
-            if (this._flippingPolygon.i === frameNum / 2) {
+            if (this._flippingPolygon.i <= frameNum / finalProgress && this._flippingPolygon.i + 1 > frameNum / finalProgress) {
                 // Triangle is collapsed
                 this._flippingPolygon.polygon.flip();
                 this._scoreCallback(this._field.darkPolygonNum(), this._field.shouldCongratulate());

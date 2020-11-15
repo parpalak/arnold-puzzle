@@ -117,3 +117,42 @@ function add_electric_force(a, b, q2) {
 function wrapNum(n) {
     return String(n).split('').map(digit => '<span class="digit">' + digit + '</span>').join('');
 }
+
+/**
+ * Custom Polyfill for Set for IE11.
+ */
+class CustomSet {
+    constructor(data) {
+        this.data = data || [];
+    }
+
+    has(item) {
+        for (let i = this.data.length; i--;) {
+            if (this.data[i] === item) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    add(item) {
+        if (this.data.indexOf(item) === -1) {
+            this.data.push(item);
+        }
+        return this;
+    }
+
+    delete(item) {
+        const idx = this.data.indexOf(item);
+        if (idx >= 0) {
+            delete this.data[idx];
+        }
+
+        return this;
+    }
+
+    forEach(callback) {
+        this.data.forEach(callback);
+    }
+}
