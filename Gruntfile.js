@@ -18,9 +18,23 @@ module.exports = function(grunt) {
                 dest: 'public/bundle.js',
             },
         },
-        terser: {
+        babel: {
+            options: {
+                sourceMap: false,
+                presets: ['@babel/preset-env'],
+                plugins: [
+                    ["@babel/plugin-proposal-class-properties", { "loose": true }]
+                ]
+            },
             main: {
-                src: 'public/bundle.js',
+                files: {
+                    'public/bundle.es5.js': 'public/bundle.js'
+                }
+            }
+        },
+        uglify: {
+            main: {
+                src: 'public/bundle.es5.js',
                 dest: 'public/bundle.min.js'
             }
         },
@@ -45,7 +59,7 @@ module.exports = function(grunt) {
             main: {
                 command: [
                     'gzip -cn6 <%= cssmin.main.dest %> > <%= cssmin.main.dest %>.gz',
-                    'gzip -cn6 <%= terser.main.dest %> > <%= terser.main.dest %>.gz',
+                    'gzip -cn6 <%= uglify.main.dest %> > <%= uglify.main.dest %>.gz',
                     'gzip -cn6 <%= processhtml.index.dest %> > <%= processhtml.index.dest %>.gz',
                 ].join(' && ')
             }
@@ -54,10 +68,11 @@ module.exports = function(grunt) {
 
     grunt.loadNpmTasks('grunt-contrib-concat');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
-    grunt.loadNpmTasks('grunt-terser');
+    grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-processhtml');
     grunt.loadNpmTasks('grunt-shell');
+    grunt.loadNpmTasks('grunt-babel');
 
     // Default task(s).
-    grunt.registerTask('default', ['concat', 'terser', 'processhtml', 'cssmin', 'shell']);
+    grunt.registerTask('default', ['concat', 'babel', 'uglify', 'processhtml', 'cssmin', 'shell']);
 };
