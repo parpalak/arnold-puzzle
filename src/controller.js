@@ -234,8 +234,17 @@ function displayDebugInfo() {
 //
 // Help control
 //
-document.getElementById('help').addEventListener('click', function () {
+document.getElementById('help').addEventListener('click', () => {
     document.body.classList.toggle('shown-help');
+});
+
+document.addEventListener('keydown', e => {
+    if ('key' in e ? (e.key === 'Escape' || e.key === 'Esc') : (e.keyCode === 27)) {
+        const classList = document.body.classList;
+        if (classList.contains('shown-help')) {
+            classList.remove('shown-help');
+        }
+    }
 });
 
 //
