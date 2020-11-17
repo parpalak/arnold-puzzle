@@ -33,7 +33,11 @@
         <span id="line-num"></span>
         <button class="small" id="plus">&nbsp;</button>
     </div>
-    <div class="goal">Score: <span class="score-goal"><span id="score" title="Dark regions number"></span>/<span id="goal" title="Upper estimate"></span></span></div>
+    <div class="goal">Score:
+        <span class="score-goal">
+            <span id="score" title="Dark regions number"></span>/<span id="goal" title="Upper estimate"></span>
+        </span>
+    </div>
 </div>
 <div id="win">
     <div class="win-info">
@@ -43,44 +47,156 @@
     </div>
 </div>
 <div id="about">
-    <h2>Rules</h2>
+    <div class="about-wrapper">
+        <div class="column">
+            <h2>Rules</h2>
 
-    <ol>
-        <li>There are several lines on&nbsp;the&nbsp;plane and each pair of&nbsp;lines intersects at one point.</li>
-        <li>The lines divide the plane into regions. You can flip over a triangular region by clicking on it.</li>
-        <li>The goal is to get as many dark regions as possible.</li>
-    </ol>
+            <ol>
+                <li>There are several lines on&nbsp;the&nbsp;plane and each pair of&nbsp;lines intersects at one
+                    point.
+                </li>
+                <li>The lines divide the plane into regions painted chess-like.</li>
+                <li>You can flip over a&nbsp;triangular region by&nbsp;clicking on&nbsp;it.</li>
+                <li>The goal is to&nbsp;get as&nbsp;many dark regions as&nbsp;possible.</li>
+            </ol>
 
-    <p>Your score is the number of dark regions. For the selected number of lines, a theoretical upper estimate is shown next to the score.</p>
+            <p>When a triangle is flipped over, the number of dark regions in its neighbourhood changes from 3 to 4 and
+                vice versa:</p>
 
-    <h2>Mathematical basis</h2>
+            <p>
+                <svg width='200' height='180' xmlns='http://www.w3.org/2000/svg'>
+                    <style>
+                        text {
+                            fill: #9df5f5
+                        }
 
-    <p>
-        This puzzle is named after Russian mathematician <a href="https://en.wikipedia.org/wiki/Vladimir_Arnold">Vladimir Arnold</a>.
-        It is inspired by one of the open mathematical problems published in his book
-        “<cite title="Problem #1983-4. Vladimir I. Arnold, ed. (15 November 2004). Arnold's Problems (2nd ed.). Springer-Verlag.">Arnold&apos;s problems</cite>”:
-    </p>
-    <blockquote>
-        Let N lines be given in the real plane, and their complement be chess-like painted black and white. What is the
-        greatest difference between the number of black and white regions?
-    </blockquote>
-    <p>
-        This problem is equivalent to the goal of the puzzle: maximizing the difference between the number of black and
-        white regions is almost the same as maximizing the number of black regions.
-    </p>
-    <p>
-        There are another closely related open mathematical problem&ndash;<a href="https://en.wikipedia.org/wiki/Kobon_triangle_problem">Kobon triangles problem</a>.
-    </p>
+                        path {
+                            mix-blend-mode: difference;
+                            fill: #a2e200;
+                        }
 
-    <h2>About author</h2>
-    <p>
-        I am a graduate of MIPT. My colleagues and I spent a lot of time trying to solve Arnold&apos;s problem.
-        The result of our research is in the <a href="https://written.ru/download/arnold.pdf">report (pdf, in Russian)</a>.
-    </p>
+                        rect {
+                            animation: bgcolor 10s infinite;
+                        }
 
-    <p>
-        The source code of this puzzle is published on <a href="https://github.com/parpalak/arnold-puzzle">Github</a>.
-    </p>
+                        path.p1 {
+                            animation: move1 10s infinite, color 10s infinite;
+                        }
+
+                        path.p2 {
+                            animation: move2 10s infinite, color 10s infinite;
+                        }
+
+                        text.new {
+                            opacity: 0;
+                            animation: opacity 10s infinite;
+                        }
+
+                        @keyframes move1 {
+                            30%, 90% {
+                                transform: translate(0px, 0px);
+                            }
+                            40%, 80% {
+                                transform: translate(0px, 30px);
+                            }
+                        }
+
+                        @keyframes move2 {
+                            30%, 90% {
+                                transform: translate(0px, 0px);
+                            }
+                            40%, 80% {
+                                transform: translate(0px, -16px);
+                            }
+                        }
+
+                        @keyframes color {
+                            34%, 86% {
+                                fill: #a2e200;
+                            }
+                            36%, 84% {
+                                fill: #00bfcc;
+                            }
+                        }
+
+                        @keyframes bgcolor {
+                            34%, 86% {
+                                fill: rgb(138 185 172);
+                            }
+                            36%, 84% {
+                                fill: #008b8b;
+                            }
+                        }
+
+                        @keyframes opacity {
+                            35%, 85% {
+                                opacity: 0;
+                            }
+                            40%, 80% {
+                                opacity: 1;
+                            }
+                        }
+                    </style>
+                    <g transform="scale(2) translate(0, -10)">
+                        <rect x="0" y="0" width="100" height="100" fill="rgb(138 185 172)"></rect>
+                        <path class="p1" d='M-10 -50 L110 130 L-10 130 Z'></path>
+                        <path class="p1" d='M110 -50 L-10 130 L110 130 Z'></path>
+                        <path class="p2" d='M110 60 L-10 60 L-10 150 L110 150 Z'></path>
+                        <text x="9" y="37">1</text>
+                        <text x="83" y="37">2</text>
+                        <text x="45" y="93">3</text>
+                        <text class="new" x="45" y="59">4</text>
+                    </g>
+                </svg>
+            </p>
+
+            <p>Your score is the total number of dark regions. For the selected number of lines, a theoretical upper
+                estimate is shown
+                next to the score.</p>
+        </div>
+
+        <div class="column">
+            <h2>Mathematical basis</h2>
+
+            <p>
+                This puzzle is named after Russian mathematician <a
+                href="https://en.wikipedia.org/wiki/Vladimir_Arnold">Vladimir
+                Arnold</a>.
+                It is inspired by one of the open mathematical problems published in his book
+                “<cite
+                title="Problem #1983-4. Vladimir I. Arnold, ed. (15 November 2004). Arnold's Problems (2nd ed.). Springer-Verlag.">Arnold&apos;s
+                problems</cite>”:
+            </p>
+
+            <blockquote>
+                Let N lines be given in the real plane, and their complement be chess-like painted black and white. What
+                is the greatest difference between the number of black and white regions?
+            </blockquote>
+
+            <p>
+                This problem is equivalent to the goal of the puzzle: maximizing the difference between the number of
+                black and white regions is almost the same as maximizing the number of black regions.
+            </p>
+            <p>
+                There are another closely related open mathematical problem&ndash;<a
+                href="https://en.wikipedia.org/wiki/Kobon_triangle_problem">Kobon triangles problem</a>.
+            </p>
+        </div>
+
+        <div class="column">
+            <h2>About author</h2>
+            <p>
+                I am a graduate of MIPT. My colleagues and I spent a lot of time trying to solve Arnold&apos;s problem.
+                The result of our research is in the <a href="https://written.ru/download/arnold.pdf">report (pdf, in
+                Russian)</a>.
+            </p>
+
+            <p>
+                The source code of this puzzle is published on <a
+                href="https://github.com/parpalak/arnold-puzzle">Github</a>.
+            </p>
+        </div>
+    </div>
 </div>
 <div id="bottom">
     <div id="info">

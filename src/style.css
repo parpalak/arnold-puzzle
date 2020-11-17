@@ -159,10 +159,17 @@ li {
     background-size: 100% 120%;
     background-position: center;
     scrollbar-width: thin;
+    overflow-y: scroll;
     }
-    #about * {
-        max-width: 50em;
+    .about-wrapper {
+        column-gap: 2.5em;
         }
+        #about .column {
+            max-width: 50em;
+            -webkit-column-break-inside: avoid;
+            page-break-inside: avoid;
+            break-inside: avoid;
+            }
     .shown-help #about {
         height: 100%;
         border-top-width: 42px;
@@ -278,6 +285,21 @@ body {
         min-width: 3.85em;
         display: inline-block;
         text-align: right;
+    }
+}
+
+@media all and (min-width: 720px) and (min-height: 400px) {
+    .about-wrapper {
+        columns: 2;
+    }
+}
+
+@media all and (min-width: 1200px) and (min-height: 400px) {
+    .about-wrapper {
+        columns: 3;
+    }
+    h2 {
+        break-before: column;
     }
 }
 
