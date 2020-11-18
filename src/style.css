@@ -114,13 +114,16 @@ button.small {
 #head {
     flex-wrap: wrap;
     position: relative;
+    line-height: 1.5;
     }
     h1 {
         margin: 0;
         font-size: 30px;
-        line-height: 1.6;
         letter-spacing: 1px;
         transition: font-size 0.2s, line-height 0.2s;
+        }
+    .score-goal {
+        pointer-events: auto;
         }
     .lines-control, .goal {
         opacity: 1;
@@ -304,12 +307,11 @@ body {
 }
 
 @media all and (max-width: 499px) {
+    #head {
+        display: block;
+    }
     button, .lines-control button {
         vertical-align: 3px;
-    }
-
-    h1 {
-        font-size: 24px;
     }
 
     .lines-control, .goal {
