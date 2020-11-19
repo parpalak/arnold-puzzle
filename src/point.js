@@ -2,6 +2,7 @@
  * Arnold's Puzzle
  *
  * @copyright Roman Parpalak 2020
+ * @license MIT
  */
 
 // Coefficients for Kutta-Merson method

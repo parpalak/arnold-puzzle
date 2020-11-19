@@ -33,6 +33,9 @@ module.exports = function(grunt) {
             }
         },
         uglify: {
+            options: {
+                banner: '/*! © 2020 Roman Parpalak */'
+            },
             main: {
                 src: 'public/bundle.es5.js',
                 dest: 'public/bundle.min.js'
