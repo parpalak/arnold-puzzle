@@ -1,4 +1,5 @@
-#[Arnold's Puzzle](https://arnold.games/)
+[Arnold's Puzzle](https://arnold.games/)
+----------------------------------------
 
 Source code of the in-browser geometric puzzle.
 
