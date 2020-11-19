@@ -102,6 +102,8 @@ class Field {
         this._cachedPointCloseToCursor = null;
         this._cachedPolygonAtCursor = null;
 
+        this.moderateFloatStep();
+
         let i;
         this.generatorNum = generators.length;
 
@@ -149,7 +151,9 @@ class Field {
             rearrangement[generator] = rearrangement[generator + 1];
             rearrangement[generator + 1] = a_i;
 
-            let point = new Point(((i - this.generatorNum / 2) / this.lineNum * 2), (generator - this.lineNum / 2));
+            const x = ((i - this.generatorNum / 2) / this.lineNum * 2) - sqr( generator / this.lineNum) * 0.5 * this.lineNum;
+            const y = generator - this.lineNum / 2 - this.lineNum*( 1 + sqr(1 - generator / this.lineNum) ) * sqr(x / this.lineNum);
+            let point = new Point(x, y);
 
             this._lines[rearrangement[generator]].addPoint(point);
             this._lines[rearrangement[generator + 1]].addPoint(point);

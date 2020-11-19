@@ -66,8 +66,7 @@ class Renderer {
                 this._flippingPolygon.polygon.resetResize(finalProgress);
                 this._flippingPolygon = null;
 
-                // Prevent freeze
-                this._skippedFrame = 120;
+                this.preventFreeze();
                 this._field.moderateFloatStep()
             } else {
                 // Loop Iteration
@@ -91,6 +90,10 @@ class Renderer {
             });
         }
     };
+
+    preventFreeze() {
+        this._skippedFrame = 120;
+    }
 
     get fps() {
         const fps = this._fps;

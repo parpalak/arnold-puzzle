@@ -87,6 +87,7 @@ function changeLineNumTo(n) {
 
     document.getElementById('line-num').innerHTML = wrapNum(n);
     document.getElementById('goal').innerHTML = wrapNum(field.darkPolygonNumLimit);
+    renderer.preventFreeze();
     renderer.drawFrame();
     recalcScore();
 
