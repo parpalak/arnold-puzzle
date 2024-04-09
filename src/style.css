@@ -164,15 +164,9 @@ li {
     scrollbar-width: thin;
     overflow-y: scroll;
     }
-    .about-wrapper {
-        column-gap: 2.5em;
+    .about-wrapper .column {
+        max-width: 50em;
         }
-        #about .column {
-            max-width: 50em;
-            -webkit-column-break-inside: avoid;
-            page-break-inside: avoid;
-            break-inside: avoid;
-            }
     .shown-help #about {
         height: 100%;
         border-top-width: 42px;
@@ -293,16 +287,31 @@ body {
 
 @media all and (min-width: 720px) and (min-height: 400px) {
     .about-wrapper {
-        columns: 2;
+        display: flex;
+        justify-content: space-between;
+        gap: 2.5em;
+    }
+    .about-wrapper .column {
+        flex: 1 1 30%;
     }
 }
 
-@media all and (min-width: 1200px) and (min-height: 400px) {
+@media all and (min-width: 720px) and (max-width: 1199px) and (min-height: 400px) {
     .about-wrapper {
-        columns: 3;
+        display: grid;
+        gap: 1em 2.5em;
     }
-    h2 {
-        break-before: column;
+
+    .column:nth-child(1) {
+        grid-area: 1 / 1 / 3 / 2;
+    }
+
+    .column:nth-child(2) {
+        grid-area: 1 / 2;
+    }
+
+    .column:nth-child(3) {
+        grid-area: 2 / 2;
     }
 }
 
