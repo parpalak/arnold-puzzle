@@ -3,4 +3,5 @@ node_modules
 public/index*
 public/style*
 public/bundle*
+public/fonts
 _logs

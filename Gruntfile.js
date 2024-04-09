@@ -4,7 +4,7 @@ module.exports = function(grunt) {
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
         concat: {
-            main: {
+            js: {
                 src: [
                     'src/utils.js',
                     'src/point.js',
@@ -17,14 +17,18 @@ module.exports = function(grunt) {
                 ],
                 dest: 'public/bundle.js',
             },
+            css: {
+                src: [
+                    'src/style.css',
+                    'src/fonts.css',
+                ],
+                dest: 'public/style.css',
+            },
         },
         babel: {
             options: {
                 sourceMap: false,
                 presets: ['@babel/preset-env'],
-                plugins: [
-                    ["@babel/plugin-proposal-class-properties", { "loose": true }]
-                ]
             },
             main: {
                 files: {
@@ -50,12 +54,30 @@ module.exports = function(grunt) {
                 dest: 'public/index.html'
             },
         },
+        copy: {
+            main: {
+                files: [
+                    {
+                        expand: true,
+                        cwd: 'node_modules/@fontsource/chakra-petch/files/',
+                        src: [
+                            'chakra-petch-latin-400-normal.woff',
+                            'chakra-petch-latin-400-normal.woff2',
+                            'chakra-petch-latin-700-normal.woff',
+                            'chakra-petch-latin-700-normal.woff2',
+                        ],
+                        dest: 'public/fonts/',
+                        filter: 'isFile'
+                    },
+                ],
+            },
+        },
         cssmin: {
             main: {
                 src: [
-                    'src/style.css',
+                    'public/style.css',
                 ],
-                dest: 'public/style.css'
+                dest: 'public/style.min.css'
             }
         },
         shell: {
@@ -70,6 +92,7 @@ module.exports = function(grunt) {
     });
 
     grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-copy');
     grunt.loadNpmTasks('grunt-contrib-cssmin');
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-processhtml');
@@ -77,5 +100,5 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-babel');
 
     // Default task(s).
-    grunt.registerTask('default', ['concat', 'babel', 'uglify', 'processhtml', 'cssmin', 'shell']);
+    grunt.registerTask('default', ['concat', 'babel', 'uglify', 'processhtml', 'copy', 'cssmin', 'shell']);
 };

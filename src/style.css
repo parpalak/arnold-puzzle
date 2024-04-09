@@ -318,11 +318,3 @@ body {
         font-size: 24px;
     }
 }
-
-@viewport {
-    width: device-width;
-}
-
-@-ms-viewport {
-    width: device-width;
-}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Arnold&apos;s Puzzle</title>
@@ -17,9 +17,11 @@
     <!-- /build -->
 
     <!-- build:template
-    <link rel="stylesheet" href="style.css?<%= hash %>">
+    <link rel="stylesheet" href="style.min.css?<%= hash %>">
     /build -->
+    <!-- build:remove -->
     <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch&display=swap" rel="stylesheet">
+    <!-- /build -->
 </head>
 <body>
 <canvas id="canvas"></canvas>
@@ -51,15 +53,13 @@
             <h2>Rules</h2>
 
             <ol>
-                <li>There are several lines on&nbsp;the&nbsp;plane and each pair of&nbsp;lines intersects at one
-                    point.
-                </li>
-                <li>The lines divide the plane into regions painted chess-like.</li>
-                <li>You can flip over a&nbsp;triangular region by&nbsp;clicking on&nbsp;it.</li>
+                <li>Several lines are drawn on&nbsp;the&nbsp;plane, intersecting at&nbsp;one point per&nbsp;pair.</li>
+                <li>The lines divide the plane into chess-like painted regions.</li>
+                <li>You can toggle a&nbsp;triangular region by&nbsp;clicking on&nbsp;it.</li>
                 <li>The goal is to&nbsp;get as&nbsp;many dark regions as&nbsp;possible.</li>
             </ol>
 
-            <p>When a triangle is flipped over, the number of dark regions in its neighbourhood changes from 3 to 4 and
+            <p>When a triangle is toggled, the number of&nbsp;dark regions in its neighbourhood changes from 3 to 4, and
                 vice versa:</p>
 
             <p>
@@ -149,8 +149,8 @@
                 </svg>
             </p>
 
-            <p>Your score is the total number of dark regions. For the selected number of lines, a theoretical upper
-                estimate is shown next to the score.</p>
+            <p>Your score is the total number of&nbsp;dark regions. The theoretical upper estimate
+                for the selected number of&nbsp;lines is displayed alongside the score.</p>
         </div>
 
         <div class="column">
@@ -159,8 +159,8 @@
             <p>
                 This puzzle is named after Russian mathematician <a
                 href="https://en.wikipedia.org/wiki/Vladimir_Arnold">Vladimir
-                Arnold</a>.
-                It is inspired by one of the open mathematical problems published in his book
+                Arnold</a>
+                and is inspired by one of&nbsp;the open mathematical problems published in his book
                 “<cite
                 title="Problem #1983-4. Vladimir I. Arnold, ed. (15 November 2004). Arnold's Problems (2nd ed.). Springer-Verlag.">Arnold&apos;s
                 problems</cite>”:
@@ -168,12 +168,12 @@
 
             <blockquote>
                 Let N lines be given in the real plane, and their complement be chess-like painted black and white. What
-                is the greatest difference between the number of black and white regions?
+                is the greatest difference between the number of&nbsp;black and white regions?
             </blockquote>
 
             <p>
-                This problem is equivalent to the goal of the puzzle: maximizing the difference between the number of
-                black and white regions is almost the same as maximizing the number of black regions.
+                This problem is equivalent to the goal of&nbsp;the puzzle: maximizing the difference between the number of
+                black and white regions is almost the same as maximizing the number of&nbsp;black regions.
             </p>
             <p>
                 There are another closely related open mathematical problem&ndash;<a
@@ -184,13 +184,13 @@
         <div class="column">
             <h2>About author</h2>
             <p>
-                I am a graduate of MIPT. My colleagues and I spent a lot of time trying to solve Arnold&apos;s problem.
-                The result of our research is in the <a href="https://written.ru/download/arnold.pdf">report (pdf, in
+                I am a graduate of&nbsp;MIPT. My colleagues and I have dedicated considerable time to&nbsp;solving Arnold&apos;s problem.
+                The result of&nbsp;our research is available in&nbsp;the&nbsp;<a href="https://parpalak.com/download/arnold.pdf">report (PDF, in
                 Russian)</a>.
             </p>
 
             <p>
-                The source code of this puzzle is published on <a
+                The source code for this puzzle is published on&nbsp;<a
                 href="https://github.com/parpalak/arnold-puzzle">Github</a>.
             </p>
         </div>
@@ -199,9 +199,9 @@
 <div id="bottom">
     <div id="info">
         <span id="copyright-sign">© 2020</span>
-        <a class="link" id="mailto-link" title="Drop me a line" href="mailto:roman%40written.ru">Roman Parpalak</a>
+        <a class="link" id="mailto-link" title="Drop me a line" href="mailto:roman%40parpalak.com">Roman Parpalak</a>
     </div>
-    <div id="instruction">Click triangles to flip. Get the maximum number of dark regions.</div>
+    <div id="instruction">Click triangles to toggle. Get the maximum number of&nbsp;dark regions.</div>
 </div>
 <!-- build:remove -->
 <script src="utils.js"></script>
