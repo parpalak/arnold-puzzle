@@ -158,9 +158,9 @@ li {
     transition: height 0.2s, border-bottom-width 0.2s, border-top-width 0.2s;
     border: 0 solid transparent;
     padding: 0 10px;
-    background-image: linear-gradient(to top, rgb(0, 26, 59) 0%, rgba(0, 26, 59, 0.7) 100%);
-    background-size: 100% 120%;
-    background-position: center;
+    background: rgba(0, 26, 59, 0.7);
+    background: linear-gradient(to top, rgb(0, 26, 59) 0%, rgba(0, 26, 59, 0.66) 100%) center;
+    background-origin: border-box;
     scrollbar-width: thin;
     overflow-y: scroll;
     }
@@ -176,6 +176,7 @@ li {
 #instruction {
     opacity: 1;
     transition: opacity 0.2s;
+    float: right;
     }
 
 /*.shown-help h1 {*/
@@ -195,6 +196,7 @@ li {
     }
 #info {
     pointer-events: auto;
+    float: left;
     }
     .parameter {
         width: 100px;

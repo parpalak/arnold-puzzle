@@ -5,12 +5,28 @@
  * @license MIT
  */
 
+window.requestAnimationFrame = window.requestAnimationFrame       ||
+window.webkitRequestAnimationFrame ||
+window.mozRequestAnimationFrame    ||
+window.oRequestAnimationFrame      ||
+window.msRequestAnimationFrame     ||
+function(callback){
+    window.setTimeout(callback, 1000 / 60);
+};
+
 //
 // Initialize model and view
 //
 const eCanvas = document.getElementById('canvas');
 const field = new Field();
-const renderer = new Renderer(eCanvas, field, recalcScore);
+const renderer = new Renderer(
+    eCanvas,
+    field,
+    recalcScore,
+    function (callback) {
+        window.requestAnimationFrame(callback);
+    }
+);
 
 //
 // Score, win screen

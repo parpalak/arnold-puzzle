@@ -22,11 +22,13 @@ class Renderer {
      * @param eCanvas
      * @param {Field} field
      * @param scoreCallback
+     * @param requestAnimationFrame
      */
-    constructor(eCanvas, field, scoreCallback) {
+    constructor(eCanvas, field, scoreCallback, requestAnimationFrame) {
         this.eCanvas = eCanvas;
         this._field = field;
         this._scoreCallback = scoreCallback;
+        this._requestAnimationFrame = requestAnimationFrame;
     }
 
     markAsDebug() {
@@ -85,7 +87,7 @@ class Renderer {
         }
 
         if (this._isRunning || this._flippingPolygon !== null) {
-            window.requestAnimationFrame(() => {
+            this._requestAnimationFrame(() => {
                 this.processFrame();
             });
         }

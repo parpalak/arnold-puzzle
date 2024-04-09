@@ -71,19 +71,15 @@
 
                         path {
                             mix-blend-mode: difference;
-                            fill: #a2e200;
-                        }
-
-                        rect {
-                            animation: bgcolor 10s infinite;
+                            fill: #00bfcc;
                         }
 
                         path.p1 {
-                            animation: move1 10s infinite, color 10s infinite;
+                            animation: move1 10s infinite;
                         }
 
                         path.p2 {
-                            animation: move2 10s infinite, color 10s infinite;
+                            animation: move2 10s infinite;
                         }
 
                         text.new {
@@ -109,24 +105,6 @@
                             }
                         }
 
-                        @keyframes color {
-                            34%, 86% {
-                                fill: #a2e200;
-                            }
-                            36%, 84% {
-                                fill: #00bfcc;
-                            }
-                        }
-
-                        @keyframes bgcolor {
-                            34%, 86% {
-                                fill: rgb(138 185 172);
-                            }
-                            36%, 84% {
-                                fill: #008b8b;
-                            }
-                        }
-
                         @keyframes opacity {
                             35%, 85% {
                                 opacity: 0;
@@ -137,7 +115,7 @@
                         }
                     </style>
                     <g transform="scale(2) translate(0, -10)">
-                        <rect x="0" y="0" width="100" height="100" fill="rgb(138 185 172)"></rect>
+                        <rect x="0" y="0" width="100" height="100" fill="#008b8b"></rect>
                         <path class="p1" d='M-10 -50 L110 130 L-10 130 Z'></path>
                         <path class="p1" d='M110 -50 L-10 130 L110 130 Z'></path>
                         <path class="p2" d='M110 60 L-10 60 L-10 150 L110 150 Z'></path>
