@@ -52,14 +52,19 @@ button {
 button.small {
     border: none;
     font-size: 16px;
-    vertical-align: 4px;
+    vertical-align: 5px;
     line-height: 1;
     margin: 0 2px;
     padding: 0;
     width: 22px;
     height: 22px;
-    background: url("data:image/svg+xml,%3Csvg width='22' height='22' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4 v14 l3 3 h14 l3 -3 v-14 l-3 -3 h-14 l-3 3 Z' fill='transparent' stroke='rgb(157, 245, 245)' stroke-width='2'%3E%3C/path%3E%3C/svg%3E");
+    background: url("data:image/svg+xml,%3Csvg width='22' height='22' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 4 v14 l3 3 h14 l3 -3 v-14 l-3 -3 h-14 l-3 3 Z' fill='transparent' stroke='rgb(157, 245, 245)' stroke-width='2' /%3E%3C/svg%3E");
     }
+    button#fullscreen {
+        background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='22'%3E%3Cpath d='M1 14 v4 l3 3 h4 m6 0 h4 l3 -3 v-4 m0 -6 v-4 l-3 -3 h-4 m-6 0 h-4 l-3 3 v4' fill='transparent' stroke='rgb(157, 245, 245)' stroke-width='2'/%3E%3C/svg%3E");
+        margin: 0;
+        vertical-align: 2px;
+        }
     button:hover {
         cursor: pointer;
         }
@@ -130,9 +135,6 @@ button.small {
         font-size: 30px;
         transition: opacity 0.2s, font-size 0.2s, line-height 0.2s;
         }
-        .lines-control button {
-            vertical-align: 5px;
-            }
 
 h2 {
     margin: 0.125em 0;
@@ -178,10 +180,11 @@ li {
     transition: opacity 0.2s;
     float: right;
     }
+#fullscreen-wrapper {
+    align-self: start;
+    text-align: right;
+    }
 
-/*.shown-help h1 {*/
-/*    font-size: 30px;*/
-/*    }*/
 .shown-help .lines-control,
 .shown-help #instruction,
 .shown-help .goal {
@@ -287,6 +290,16 @@ body {
     }
 }
 
+@media all and (min-width: 1000px) {
+    #instruction {
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin: auto;
+        text-align: center;
+    }
+}
+
 @media all and (min-width: 720px) and (min-height: 400px) {
     .about-wrapper {
         display: flex;
@@ -301,7 +314,7 @@ body {
 @media all and (min-width: 720px) and (max-width: 1199px) and (min-height: 400px) {
     .about-wrapper {
         display: grid;
-        gap: 1em 2.5em;
+        gap: 0 2.5em;
     }
 
     .column:nth-child(1) {
@@ -321,8 +334,8 @@ body {
     #head {
         display: block;
     }
-    button, .lines-control button {
-        vertical-align: 3px;
+    .lines-control button.small {
+        vertical-align: 4px;
     }
 
     .lines-control, .goal {

@@ -14,6 +14,14 @@ function(callback){
     window.setTimeout(callback, 1000 / 60);
 };
 
+document.getElementById('fullscreen').addEventListener('click', () => {
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else {
+        document.documentElement.requestFullscreen();
+    }
+});
+
 //
 // Initialize model and view
 //
