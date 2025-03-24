@@ -331,6 +331,9 @@ body {
 }
 
 @media all and (max-width: 499px) {
+    #instruction {
+        order: 9;
+    }
     #head {
         display: block;
     }
